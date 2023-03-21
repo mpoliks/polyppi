@@ -1,5 +1,6 @@
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
+import os
 
 class GDriveSetup(object):
     def __init__(self):
@@ -19,11 +20,12 @@ class GDriveSetup(object):
             self.gauth.Authorize()
         self.gauth.SaveCredentialsFile("cred.txt")
         
-    def file_download(self, folder_id):
+    def file_download(self, folder_id, target_folder):
         
         file_list = self.drive.ListFile({'q': "'{}' in parents and trashed = false".format(folder_id)}).GetList()
         for i, file1 in enumerate(sorted(file_list, key = lambda x: x['title']), start = 1):
             print('Downloading {} from GDrive({}/{})'.format(file1['title'], i, len(file_list)))
             file1.GetContentFile(file1['title'])
+            os.rename((target_folder.replace("playback/", file1['title'])), (target_folder + file1['title']))
         print("Download Complete")
         

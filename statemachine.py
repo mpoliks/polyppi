@@ -11,6 +11,7 @@ test_mode = False
 download_folder = '101FNH6ERnutThe6ztVLF8U11UnT5fybD'
 upload_folder = '1R8iCvcadFcgn3KGWdO_O4vAN-qa_YGig'
 playback_dir = "/home/marek/Desktop/polyppi/playback/"
+recordings_dir = "/home/marek/Desktop/polyppi/recordings/"
 
 ## Audio Settings
 channels = 1
@@ -43,8 +44,8 @@ def setup():
     if not test_mode:
         print("Initializing!")        
         gDrive = GDriveSetup()
-        if(len(os.listdir("/home/marek/Desktop/polyppi/playback/")) == 0):
-            gDrive.file_download(download_folder)            
+        if(len(os.listdir(playback_dir)) == 0):
+            gDrive.file_download(download_folder, playback_dir)            
         drive = gDrive.drive  
     listener = RMSListener(channels, sample_rate, frames_per_block, write_base, drive, upload_folder, test_mode)
     player = FilePlayback()
