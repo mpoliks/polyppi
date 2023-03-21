@@ -29,6 +29,16 @@ def charge_status():
     return False
 
 def setup():
+    bus.write_byte_data(address, 0x0b, 0x29) #turn off write protection
+    time.sleep (0.01)
+    print(bus.read_byte_data(address, 0x0b))
+    bus.write_byte_data(address, 0x20, 0x48) #turn on SCL wake, charge protection
+    time.sleep (0.01)
+    if bus.read_byte_data(address, 0x20) == 0x48:
+        print("OK: Battery Initialized Correctly")
+    else:
+        print ("ERR: Battery Not Set Correctly!")
+        print (bus.read_byte_data(address, 0x20))
     drive = None
     if not test_mode:
         print("Initializing!")        
