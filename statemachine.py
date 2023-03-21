@@ -1,6 +1,6 @@
+import os, smbus, logging
 from filemgmt_fw import *
 from audio_fw import *
-import smbus
 
 ## Battery Management:
 bus=smbus.SMBus(1)
@@ -10,8 +10,10 @@ address = 0x57
 test_mode = False
 download_folder = '101FNH6ERnutThe6ztVLF8U11UnT5fybD'
 upload_folder = '1R8iCvcadFcgn3KGWdO_O4vAN-qa_YGig'
-playback_dir = "/home/marek/Desktop/polyppi/playback/"
-recordings_dir = "/home/marek/Desktop/polyppi/recordings/"
+dir_path = os.path.dirname(os.path.realpath(__file__))
+playback_dir = dir_path + "/playback/"
+recordings_dir = dir_path + "/recordings/"
+logging.basicConfig(filename='log.log', format='%(asctime)s %(message)s', encoding='utf-8', level=logging.DEBUG)
 
 ## Audio Settings
 channels = 1
@@ -29,20 +31,22 @@ def charge_status():
         return True
     return False
 
-def setup():
+def calibrate_battery():
     bus.write_byte_data(address, 0x0b, 0x29) #turn off write protection
     time.sleep (0.01)
-    print(bus.read_byte_data(address, 0x0b))
     bus.write_byte_data(address, 0x20, 0x48) #turn on SCL wake, charge protection
     time.sleep (0.01)
     if bus.read_byte_data(address, 0x20) == 0x48:
-        print("OK: Battery Initialized Correctly")
+        logging.info("OK: Battery Initialized Correctly")
     else:
-        print ("ERR: Battery Not Set Correctly!")
-        print (bus.read_byte_data(address, 0x20))
+        logging.error("ERR: Battery Not Set Correctly!")
+        logging.error(bus.read_byte_data(address, 0x20))
+
+def setup():
+    calibrate_battery()
     drive = None
     if not test_mode:
-        print("Initializing!")        
+        logging.info("Initializing!")        
         gDrive = GDriveSetup()
         if(len(os.listdir(playback_dir)) == 0):
             gDrive.file_download(download_folder, playback_dir)            
@@ -56,7 +60,7 @@ def loop(listener, player, previous_status):
     while(1):
         time.sleep(0.2)
         status = charge_status()
-        if status != previous_status: print("OK: Transitioning!")
+        if status != previous_status: logging.info("Charge Change Detected")
         if status:
             if status != previous_status:
                 if not player.is_streaming(): previous_status = status
@@ -70,13 +74,14 @@ def loop(listener, player, previous_status):
                 previous_status = status
                 player.play(playback_dir, volume)
             if player.is_streaming() == False:
-                print("OK: Looping")
+                logging.info("Looping Audio")
                 player.killStream()
                 player.play(playback_dir, volume)
 
 if __name__ == "__main__":
     previous_status = None
     listener, player = setup()
+    print("*--INITIALIZED AND RUNNING--*")
     loop(listener, player, previous_status)
     
     

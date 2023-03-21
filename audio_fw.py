@@ -1,11 +1,6 @@
-import pyaudio
-import wave
-import math
-import struct
-import alsaaudio
-import time
-import random
-import os
+import pyaudio, wave, alsaaudio
+import math, struct, time, random
+import os, logging
 
 def get_rms(block):
     count = len(block)/2
@@ -17,10 +12,9 @@ def get_rms(block):
         sum_squares += n*n
     return math.sqrt(sum_squares / count)
 
-
 class RMSListener(object):
     def __init__(self, channels, rate, fpb, write_base, drive, drive_loc, to_upload):
-        print("OK: Listener Initialized")
+        logging.info("Listener Initialized")
         self.frames = []
         self.itercount = 0        
         self.recflag = 0
@@ -44,7 +38,7 @@ class RMSListener(object):
             self.stream.close()
         except IOError as e:
             self.errorcount += 1
-            print( "(%d) Error pausing stream: %s"%(self.errorcount,e) )
+            logging.error( "(%d) Error pausing stream: %s"%(self.errorcount,e) )
         
     def start(self):
         self.stream = self.open_mic_stream()
@@ -53,14 +47,14 @@ class RMSListener(object):
         device_index = None            
         for i in range( self.pa.get_device_count() ):     
             devinfo = self.pa.get_device_info_by_index(i)   
-            print("Device %d: %s"%(i,devinfo["name"]))
+            #logging.debug("Device %d: %s"%(i,devinfo["name"]))
             for keyword in ["mic","input"]:
                 if keyword in devinfo["name"].lower():
-                    print( "Found an input: device %d - %s"%(i,devinfo["name"]) )
+                    #logging.debug("Found an input: device %d - %s"%(i,devinfo["name"]))
                     device_index = i
                     return device_index
         if device_index == None:
-            print( "No preferred input found; using default input device." )
+            logging.debug("No preferred input found; using default input device.")
         return device_index
 
     def open_mic_stream(self):
@@ -77,24 +71,23 @@ class RMSListener(object):
             block = self.stream.read(self.fpb, exception_on_overflow = False)
         except IOError as e:
             self.errorcount += 1
-            print( "(%d) Error recording: %s"%(self.errorcount,e) )
+            logging.error( "(%d) Error recording: %s"%(self.errorcount,e) )
         amplitude = get_rms(block)
         print(amplitude)               
         if amplitude > rms_thresh and not self.recflag:
             self.rmscount += 1
-            print("OK: *--polling for sustained signal " + str(self.rmscount) + " / " + str(rec_thresh) + "--*")      
+            logging.debug("*--polling for sustained signal " + str(self.rmscount) + " / " + str(rec_thresh) + "--*")      
             if self.rmscount >= rec_thresh:
-                print("OK: *--recording initiated--*")
+                logging.info("*--recording initiated--*")
                 self.recflag = 1
                 self.rmscount = 0                  
         if amplitude < rms_thresh and not self.recflag:
-            print("OK: Resetting Listening Count")
+            logging.debug("Resetting Listening Count")
             self.rmscount = 0        
         if self.recflag:
             self.rmscount += 1
             self.frames.append( block )
-            presence_thresh = True
-            print("OK: *--block " + str(self.rmscount) + "/" + str(write_thresh) + "--*")                
+            logging.debug("*--block " + str(self.rmscount) + "/" + str(write_thresh) + "--*")                
         if self.rmscount > write_thresh:
             self.itercount += 1
             self.write_time = time.time()
@@ -110,6 +103,8 @@ class RMSListener(object):
             file1 = self.drive.CreateFile({'parents': [{'id': self.upload_folder_id}]})
             file1.SetContentFile(fileindex)
             file1.Upload()
+            logging.info("Recording Upload Complete")
+            os.remove(fileindex)
         
     def record_kill(self):
         wf = wave.open("/home/marek/Desktop/polyppi/recordings/" + self.write_base + str(self.write_time) + str(self.itercount) + ".wav", 'wb')
@@ -130,18 +125,18 @@ class RMSListener(object):
         
 class FilePlayback(object):
     def __init__(self):
-        print("OK: Initialized File Player")
+        logging.info("Initialized File Player")
         self.m = alsaaudio.Mixer()
         self.stream = None
         
     def play(self, playdir, playback_volume):
-        print("OK: Starting Playback")
+        logging.info("Starting Playback")
         self.volume = playback_volume
         self.m.setvolume(self.volume)
         playfile = playdir + "/" + random.choice(os.listdir(playdir))
         self.wf = wave.open(playfile, 'rb')
         self.pa = pyaudio.PyAudio()
-        print("OK: Playing back " + playfile)
+        logging.info("Playing back " + playfile)
         self.stream = self.pa.open(format = self.pa.get_format_from_width(self.wf.getsampwidth()),
                               channels = self.wf.getnchannels(),
                               rate = self.wf.getframerate(),
@@ -160,7 +155,7 @@ class FilePlayback(object):
         return False
     
     def killStream(self):
-        print ("OK: Killing Stream")
+        logging.info ("Killing Playback Stream")
         self.stream.stop_stream()
         self.stream.close()
         self.pa.terminate()
