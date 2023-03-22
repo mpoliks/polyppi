@@ -95,10 +95,8 @@ def loop(listener, player, previous_status):
 
 if __name__ == "__main__":
     print("*--HALTING TO ALLOW FOR CONNECTION TO COMPLETE--*")
-    time.sleep(240)
     previous_status = None
     listener, player = setup()
-    time.sleep(60)
     print("*--INITIALIZED AND RUNNING--*")
     logging.info("Successfully Started Running")
     loop(listener, player, previous_status)
