@@ -1,3 +1,5 @@
 smbus
+alsaaudio
 PyDrive
 PyAudio
+schedule

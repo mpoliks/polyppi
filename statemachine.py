@@ -1,4 +1,5 @@
-import os, smbus, logging
+import os, smbus, logging, schedule, time
+from datetime import datetime
 from filemgmt_fw import *
 from audio_fw import *
 
@@ -7,13 +8,16 @@ bus=smbus.SMBus(1)
 address = 0x57
 
 ## File Management:
+pi_id = "R3vE20"
 test_mode = False
 download_folder = '101FNH6ERnutThe6ztVLF8U11UnT5fybD'
 upload_folder = '1R8iCvcadFcgn3KGWdO_O4vAN-qa_YGig'
+log_folder = '1_RQT4sVP3-KD6JX-G5wiDPwxYsPQ8y5O'
 dir_path = os.path.dirname(os.path.realpath(__file__))
 playback_dir = dir_path + "/playback/"
 recordings_dir = dir_path + "/recordings/"
-logging.basicConfig(filename='log.log', format='%(asctime)s %(message)s', encoding='utf-8', level=logging.DEBUG)
+logs_dir = dir_path + "/logs/"
+logging.basicConfig(filename='logs/log.log', format='%(asctime)s %(message)s', encoding='utf-8', level=logging.DEBUG)
 
 ## Audio Settings
 channels = 1
@@ -42,15 +46,26 @@ def calibrate_battery():
         logging.error("ERR: Battery Not Set Correctly!")
         logging.error(bus.read_byte_data(address, 0x20))
 
+def upload_logs(drive):
+    fileindex = log_path + "/" + pi_id + str(datetime.now()) + ".log"
+    os.rename (log_path + "/log.log", fileindex)
+    print(fileindex)
+    file1 = drive.CreateFile({'parents': [{'id': log_folder}]})
+    file1.SetContentFile(fileindex)
+    file1.Upload()
+    logging.info("LogFile Upload Complete")
+    os.remove(fileindex)
+
 def setup():
     calibrate_battery()
-    drive = None
+    drive = None    
     if not test_mode:
         logging.info("Initializing!")        
         gDrive = GDriveSetup()
         if(len(os.listdir(playback_dir)) == 0):
             gDrive.file_download(download_folder, playback_dir)            
-        drive = gDrive.drive  
+        drive = gDrive.drive
+        schedule.every().hour.do(upload_logs, drive)
     listener = RMSListener(channels, sample_rate, frames_per_block, write_base, drive, upload_folder, test_mode)
     player = FilePlayback()
     time.sleep(1)
@@ -63,10 +78,10 @@ def loop(listener, player, previous_status):
         if status != previous_status: logging.info("Charge Change Detected")
         if status:
             if status != previous_status:
-                if not player.is_streaming(): previous_status = status
-                if player.is_streaming(): player.fadeOut()
-                ## find another way to call this in a loop!
-                listener.start() 
+                if not player.is_streaming():
+                    previous_status = status
+                    listener.start()
+                else: player.fadeOut()
             listener.listen(rms_thresh, rec_block_count, write_block_count)
         if status == False:
             if status != previous_status: 
@@ -79,9 +94,13 @@ def loop(listener, player, previous_status):
                 player.play(playback_dir, volume)
 
 if __name__ == "__main__":
+    print("*--HALTING TO ALLOW FOR CONNECTION TO COMPLETE--*")
+    time.sleep(240)
     previous_status = None
     listener, player = setup()
+    time.sleep(60)
     print("*--INITIALIZED AND RUNNING--*")
+    logging.info("Successfully Started Running")
     loop(listener, player, previous_status)
     
     

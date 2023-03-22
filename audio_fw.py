@@ -125,9 +125,9 @@ class RMSListener(object):
         
 class FilePlayback(object):
     def __init__(self):
-        logging.info("Initialized File Player")
         self.m = alsaaudio.Mixer()
         self.stream = None
+        logging.info("Initialized File Player")
         
     def play(self, playdir, playback_volume):
         logging.info("Starting Playback")
