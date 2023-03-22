@@ -94,6 +94,7 @@ def loop(listener, player, previous_status):
                 player.play(playback_dir, volume)
 
 if __name__ == "__main__":
+    logging.info("PID = " + str(os.getpid()))
     print("*--HALTING TO ALLOW FOR CONNECTION TO COMPLETE--*")
     previous_status = None
     listener, player = setup()

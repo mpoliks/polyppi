@@ -1,8 +1,8 @@
 To install, run:
 
 a) clone this repo to the pi somewhere accessible and navigate to that directory in your terminal (e.g. via `cd`).
-b) run `pip install -r requirements.txt`
-c) run `sudo chmox +x polyp.sh`
+b) run `sudo apt-get install pulseaudio` and then `pip install -r requirements.txt`
+c) run `sudo chmod +x polyp.sh`
 d) run `curl http://cdn.pisugar.com/release/pisugar-power-manager.sh | sudo bash`
 e) run ifconfig and grab the local inet ip address
 f) go to your browser and enter http://<your ip>:8421 and schedule wake up to "On Power Restore"
