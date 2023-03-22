@@ -25,5 +25,5 @@ ctl.!default {
 n) reboot (`sudo reboot`)
 o) select `snd_rpi_hifiberrydac` as your output device and `Andrea Pure Audio` as your input device (in the menu bar the sound and mic icons)
 p) troubleshoot here as needed: https://www.hifiberry.com/docs/software/configuring-linux-3-18-x/
-q) run crontab -e and enter the lines "@reboot sh /home/marek/Desktop/polyppi/polyp.sh" at the bottom
+q) run crontab -e and enter the lines "@reboot sleep 30 && /home/marek/Desktop/polyppi/polyp.sh" at the bottom
 r) reboot the pi (`sudo reboot`) and it will run, check log.log for any errors
