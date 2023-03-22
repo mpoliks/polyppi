@@ -1,5 +1,5 @@
 #!/bin/bash
-
+export XDG_RUNTIME_DIR="/run/user/1000"
 cd "/home/marek/Desktop/polyppi"
 rm -r "/home/marek/Desktop/polyppi/recordings"
 rm -r "/home/marek/Desktop/polyppi/playback"

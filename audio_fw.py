@@ -126,6 +126,9 @@ class RMSListener(object):
 class FilePlayback(object):
     def __init__(self):
         logging.info("Initializing Mixer")
+        logging.info(alsaaudio.mixers())
+        logging.info(alsaaudio.cards())
+        logging.info(alsaaudio.pcms())
         for mixername in alsaaudio.mixers():
             logging.info("Trying " + str(mixername))
             if str(mixername) == "Master" or str(mixername) == "PCM":
@@ -138,9 +141,14 @@ class FilePlayback(object):
     def play(self, playdir, playback_volume):
         logging.info("Starting Playback")
         self.volume = playback_volume
+        logging.info (self.volume)
+        logging.info(self.m)
         self.m.setvolume(self.volume)
+        logging.info("Selecting from " + str(playdir))
         playfile = playdir + "/" + random.choice(os.listdir(playdir))
+        logging.info("Selected: " + str(playfile))
         self.wf = wave.open(playfile, 'rb')
+        logging.info("Opened Playfile")
         self.pa = pyaudio.PyAudio()
         logging.info("Playing back " + playfile)
         self.stream = self.pa.open(format = self.pa.get_format_from_width(self.wf.getsampwidth()),
