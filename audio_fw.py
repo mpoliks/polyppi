@@ -69,32 +69,32 @@ class RMSListener(object):
     def listen(self, rms_thresh, rec_thresh, write_thresh):
         try:
             block = self.stream.read(self.fpb, exception_on_overflow = False)
+            amplitude = get_rms(block)
+            print(amplitude)               
+            if amplitude > rms_thresh and not self.recflag:
+                self.rmscount += 1
+                logging.debug("*--polling for sustained signal " + str(self.rmscount) + " / " + str(rec_thresh) + "--*")      
+                if self.rmscount >= rec_thresh:
+                    logging.info("*--recording initiated--*")
+                    self.recflag = 1
+                    self.rmscount = 0                  
+            if amplitude < rms_thresh and not self.recflag:
+                logging.debug("Resetting Listening Count")
+                self.rmscount = 0        
+            if self.recflag:
+                self.rmscount += 1
+                self.frames.append( block )
+                logging.debug("*--block " + str(self.rmscount) + "/" + str(write_thresh) + "--*")                
+            if self.rmscount > write_thresh:
+                self.itercount += 1
+                self.write_time = time.time()
+                self.record_kill()
+                self.postdata()
+                self.rmscount = 0
+                self.recflag = 0
         except IOError as e:
             self.errorcount += 1
             logging.error( "(%d) Error recording: %s"%(self.errorcount,e) )
-        amplitude = get_rms(block)
-        print(amplitude)               
-        if amplitude > rms_thresh and not self.recflag:
-            self.rmscount += 1
-            logging.debug("*--polling for sustained signal " + str(self.rmscount) + " / " + str(rec_thresh) + "--*")      
-            if self.rmscount >= rec_thresh:
-                logging.info("*--recording initiated--*")
-                self.recflag = 1
-                self.rmscount = 0                  
-        if amplitude < rms_thresh and not self.recflag:
-            logging.debug("Resetting Listening Count")
-            self.rmscount = 0        
-        if self.recflag:
-            self.rmscount += 1
-            self.frames.append( block )
-            logging.debug("*--block " + str(self.rmscount) + "/" + str(write_thresh) + "--*")                
-        if self.rmscount > write_thresh:
-            self.itercount += 1
-            self.write_time = time.time()
-            self.record_kill()
-            self.postdata()
-            self.rmscount = 0
-            self.recflag = 0
     
     def postdata(self):
         fileindex = "/home/marek/Desktop/polyppi/recordings/" + self.write_base + str(self.write_time) + str(self.itercount) + ".wav"
@@ -132,6 +132,7 @@ class FilePlayback(object):
                 logging.info("Mixername" + str(mixername) + "selected")
                 self.m = alsaaudio.Mixer(mixername)
         self.stream = None
+        self.volume = None
         logging.info("Initialized File Player")
         
     def play(self, playdir, playback_volume):
@@ -166,8 +167,12 @@ class FilePlayback(object):
         self.pa.terminate()
     
     def fadeOut(self):
+        if self.volume == None:
+            return True
         if self.volume != 0:
             self.volume = self.volume - 5
             self.m.setvolume(self.volume)
-            return
-        self.killStream()
+            return False
+        else:
+            self.killStream()
+            return True

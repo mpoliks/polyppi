@@ -27,11 +27,11 @@ frames_per_block = int(sample_rate*block_freq)
 rms_thresh = 0.25 #amp threshold over which presence is determined
 rec_block_count = 2 #recording starts
 write_block_count = 10 #recording ends
-volume = 70 #volume in % of playback
+volume = 90 #volume in % of playback
 write_base = "rec_" #filename base for recordings
 
 def charge_status():
-    if bus.read_byte_data(address, 0x02) == 236:
+    if (bus.read_byte_data(address, 0x02) & (1<<7)):
         return True
     return False
 
@@ -75,13 +75,14 @@ def loop(listener, player, previous_status):
     while(1):
         time.sleep(0.2)
         status = charge_status()
-        if status != previous_status: logging.info("Charge Change Detected")
+        if status != previous_status:
+            logging.info("Charge Change Detected, Status = " + str(status))
         if status:
             if status != previous_status:
-                if not player.is_streaming():
-                    previous_status = status
-                    listener.start()
-                else: player.fadeOut()
+                while player.fadeOut() == False:
+                    time.sleep(0.01)
+                previous_status = status
+                listener.start()
             listener.listen(rms_thresh, rec_block_count, write_block_count)
         if status == False:
             if status != previous_status: 
