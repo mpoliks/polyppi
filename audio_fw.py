@@ -126,7 +126,11 @@ class RMSListener(object):
 class FilePlayback(object):
     def __init__(self):
         logging.info("Initializing Mixer")
-        self.m = alsaaudio.Mixer()
+        for mixername in alsaaudio.mixers():
+            logging.info("Trying " + str(mixername))
+            if str(mixername) == "Master" or str(mixername) == "PCM":
+                logging.info("Mixername" + str(mixername) + "selected")
+                self.m = alsaaudio.Mixer(mixername)
         self.stream = None
         logging.info("Initialized File Player")
         
