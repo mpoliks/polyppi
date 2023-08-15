@@ -2,6 +2,17 @@ import pyaudio, wave, alsaaudio
 import math, struct, time, random
 import os, logging
 
+## Audio Settings
+channels = 1
+sample_rate = 48000
+block_freq = 0.5 #frequency of input monitor
+frames_per_block = int(sample_rate*block_freq)
+rms_thresh = 0.25 #amp threshold over which presence is determined
+rec_block_count = 2 #recording starts
+write_block_count = 10 #recording ends
+volume = 90 #volume in % of playback
+write_base = "rec_" #filename base for recordings
+
 def get_rms(block):
     count = len(block)/2
     format = "%dh"%(count)
@@ -13,7 +24,7 @@ def get_rms(block):
     return math.sqrt(sum_squares / count)
 
 class RMSListener(object):
-    def __init__(self, channels, rate, fpb, write_base, drive, drive_loc, to_upload):
+    def __init__(self, write_base, drive, drive_loc, to_upload):
         logging.info("Listener Initialized")
         self.frames = []
         self.itercount = 0        
@@ -22,8 +33,8 @@ class RMSListener(object):
         self.errorcount = 0        
         self.audio_format = pyaudio.paInt16
         self.channels = channels
-        self.rate = rate
-        self.fpb = fpb
+        self.rate = sample_rate
+        self.fpb = frames_per_block
         self.write_base = write_base
         self.write_time = 0
         self.drive = drive
