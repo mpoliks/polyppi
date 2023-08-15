@@ -24,7 +24,7 @@ def get_rms(block):
     return math.sqrt(sum_squares / count)
 
 class RMSListener(object):
-    def __init__(self, write_base, drive, drive_loc, to_upload):
+    def __init__(self, drive, drive_loc, to_upload):
         logging.info("Listener Initialized")
         self.frames = []
         self.itercount = 0        
