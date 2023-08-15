@@ -28,7 +28,7 @@ class RMSListener(object):
         logging.info("Listener Initialized")
         self.frames = []
         self.itercount = 0        
-        self.recflag = 0
+        self.rec_flag = 0
         self.rmscount = 0
         self.errorcount = 0        
         self.audio_format = pyaudio.paInt16
@@ -77,32 +77,32 @@ class RMSListener(object):
                               frames_per_buffer = self.fpb)
         return stream
 
-    def listen(self, rms_thresh, rec_thresh, write_thresh):
+    def listen(self):
         try:
             block = self.stream.read(self.fpb, exception_on_overflow = False)
             amplitude = get_rms(block)
             print(amplitude)               
-            if amplitude > rms_thresh and not self.recflag:
+            if amplitude > rms_thresh and not self.rec_flag:
                 self.rmscount += 1
-                logging.debug("*--polling for sustained signal " + str(self.rmscount) + " / " + str(rec_thresh) + "--*")      
-                if self.rmscount >= rec_thresh:
+                logging.debug("*--polling for sustained signal " + str(self.rmscount) + " / " + str(rec_block_count) + "--*")      
+                if self.rmscount >= rec_block_count:
                     logging.info("*--recording initiated--*")
-                    self.recflag = 1
+                    self.rec_flag = 1
                     self.rmscount = 0                  
-            if amplitude < rms_thresh and not self.recflag:
+            if amplitude < rms_thresh and not self.rec_flag:
                 logging.debug("Resetting Listening Count")
                 self.rmscount = 0        
-            if self.recflag:
+            if self.rec_flag:
                 self.rmscount += 1
                 self.frames.append( block )
-                logging.debug("*--block " + str(self.rmscount) + "/" + str(write_thresh) + "--*")                
-            if self.rmscount > write_thresh:
+                logging.debug("*--block " + str(self.rmscount) + "/" + str(write_block_count) + "--*")                
+            if self.rmscount > write_block_count:
                 self.itercount += 1
                 self.write_time = time.time()
                 self.record_kill()
                 self.postdata()
                 self.rmscount = 0
-                self.recflag = 0
+                self.rec_flag = 0
         except IOError as e:
             self.errorcount += 1
             logging.error( "(%d) Error recording: %s"%(self.errorcount,e) )

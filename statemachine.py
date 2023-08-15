@@ -8,35 +8,40 @@ test_mode = False ## Test Mode disables connectivity.
 status = None
 
 def setup():
-
+    
+    global test_mode
+    global status
+    drive = None
     boot_manager = BootManager()
     led = LED()
+    logging.info("Initializing LEDs")
+    led.update("connecting")
+    logging.info("Initializing Battery")
     battery = Battery(bus, address)
+    
+    logging.info("Setting Up GDrive")
+    gDrive = GDriveSetup()    
+    drive = gDrive.drive
+    boot_manager.populate(gDrive, led)
 
     if not test_mode:
         logging.info("Initializing!")        
         try:
-            LED.update("connecting")
-            gDrive = GDriveSetup()       
-            drive = gDrive.drive
-            boot_manager.wipe (drive, led)
+
+            logging.info("Wiping Filesystem and Downloading")
+            
 
         except:
             logging.error("No Internet Connection")
             test_mode = True
-            LED.status("err")
-            shutil.copy(dir_path + "/ex/example.wav", playback_dir)
-            logging.error("Restoring Base Playback File")
-           
-
-    else: drive = None
+            led.update("err")
 
     listener = RMSListener(drive, upload_folder, test_mode)
     player = FilePlayback()
 
     if not test_mode: 
-        schedule.every().day.at("4.04").do(status = boot_manager.stall(listener, player))
-        schedule.every().day.at("4:08").do(status = boot_manager.wipe(drive, led))
+        schedule.every().day.at("04:04").do(status = boot_manager.stall(listener, player))
+        schedule.every().day.at("04:08").do(status = boot_manager.wipe(drive, led))
         schedule.every().minute.at(":55").do(boot_manager.pull_vitals(listener, player, battery))
         schedule.every().hour.do(gDrive.upload_logs, drive)
 
@@ -46,9 +51,11 @@ def setup():
 
 
 
-def loop(listener, player, battery, led, previous_status = None):
+def loop(listener, player, led, battery, previous_status = None):
     
+    global status
     time_threshold = 0
+    
     while(1):
         # make batt read only when status isn't holding
 
@@ -87,7 +94,7 @@ def loop(listener, player, battery, led, previous_status = None):
                 status = battery.charge_status()
             except:
                 logging.error("Battery Charge Read Failed")
-                LED.update("err")
+                led.update("err")
             if status != previous_status:
                 logging.info("Charge Change Detected, Status = " + str(status))
                 battery.vitals["transition_events"] += 1
