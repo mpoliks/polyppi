@@ -1,29 +1,24 @@
-2023-08-15 16:50:31,799 PID = 30494
-2023-08-15 16:50:31,845 Initializing LEDs
-2023-08-15 16:50:31,888 Initializing Battery
-2023-08-15 16:50:31,910 OK: Battery Initialized Correctly
-2023-08-15 16:50:31,911 Setting Up GDrive
-2023-08-15 16:50:31,911 Initial Authorizing
-2023-08-15 16:50:31,916 Authorizing
-2023-08-15 16:50:31,920 file_cache is only supported with oauth2client<4.0.0
-2023-08-15 16:50:31,929 Accessing Google Drive
-2023-08-15 16:50:31,956 URL being requested: GET https://www.googleapis.com/drive/v2/files?q=%27101FNH6ERnutThe6ztVLF8U11UnT5fybD%27+in+parents+and+trashed+%3D+false&maxResults=1000&alt=json
-2023-08-15 16:50:32,361 Downloading hydra_rev1.wav from GDrive(1/4)
-2023-08-15 16:50:33,536 Downloading hydra_rev3.wav from GDrive(2/4)
-2023-08-15 16:50:34,545 Downloading hydra_rev7wav from GDrive(3/4)
-2023-08-15 16:50:35,400 Downloading hydra_rev9.wav from GDrive(4/4)
-2023-08-15 16:50:51,551 Download Complete
-2023-08-15 16:50:51,600 No GDrive Connection
-2023-08-15 16:50:51,643 Restoring Base Playback Files
-2023-08-15 16:50:51,644 Initializing!
-2023-08-15 16:50:51,644 Wiping Filesystem and Downloading
-2023-08-15 16:50:51,644 Listener Initialized
-2023-08-15 16:50:52,759 No preferred input found; using default input device.
-2023-08-15 16:50:52,759 Initializing Mixer
-2023-08-15 16:50:52,789 ['Master', 'Capture']
-2023-08-15 16:50:52,791 ['sndrpihifiberry', 'PureAudio']
-2023-08-15 16:50:52,836 ['null', 'lavrate', 'samplerate', 'speexrate', 'jack', 'oss', 'pulse', 'upmix', 'vdownmix', 'default', 'hw:CARD=sndrpihifiberry,DEV=0', 'plughw:CARD=sndrpihifiberry,DEV=0', 'sysdefault:CARD=sndrpihifiberry', 'dmix:CARD=sndrpihifiberry,DEV=0', 'usbstream:CARD=sndrpihifiberry', 'hw:CARD=PureAudio,DEV=0', 'plughw:CARD=PureAudio,DEV=0', 'sysdefault:CARD=PureAudio', 'front:CARD=PureAudio,DEV=0', 'surround21:CARD=PureAudio,DEV=0', 'surround40:CARD=PureAudio,DEV=0', 'surround41:CARD=PureAudio,DEV=0', 'surround50:CARD=PureAudio,DEV=0', 'surround51:CARD=PureAudio,DEV=0', 'surround71:CARD=PureAudio,DEV=0', 'iec958:CARD=PureAudio,DEV=0', 'dmix:CARD=PureAudio,DEV=0', 'usbstream:CARD=PureAudio']
-2023-08-15 16:50:52,854 Trying Master
-2023-08-15 16:50:52,855 MixernameMasterselected
-2023-08-15 16:50:52,873 Trying Capture
-2023-08-15 16:50:52,873 Initialized File Player
+2023-08-16 12:20:22,538 PID = 2674
+2023-08-16 12:20:22,580 Initializing LEDs
+2023-08-16 12:20:22,622 Initializing Battery
+2023-08-16 12:20:22,644 OK: Battery Initialized Correctly
+2023-08-16 12:20:22,644 Setting Up GDrive
+2023-08-16 12:20:22,644 Initial Authorizing
+2023-08-16 12:20:22,649 Authorizing
+2023-08-16 12:20:22,653 file_cache is only supported with oauth2client<4.0.0
+2023-08-16 12:20:22,661 Accessing Google Drive
+2023-08-16 12:20:22,661 Wiping Filesystem and Downloading
+2023-08-16 12:20:22,687 URL being requested: GET https://www.googleapis.com/drive/v2/files?q=%27101FNH6ERnutThe6ztVLF8U11UnT5fybD%27+in+parents+and+trashed+%3D+false&maxResults=1000&alt=json
+2023-08-16 12:20:23,040 Will Download the Files set()
+2023-08-16 12:20:23,041 Removing Old Files set()
+2023-08-16 12:20:23,041 Download Complete
+2023-08-16 12:20:23,041 Listener Initialized
+2023-08-16 12:20:23,178 No preferred input found; using default input device.
+2023-08-16 12:20:23,179 Initializing Mixer
+2023-08-16 12:20:23,197 ['Master', 'Capture']
+2023-08-16 12:20:23,199 ['sndrpihifiberry', 'PureAudio']
+2023-08-16 12:20:23,234 ['null', 'lavrate', 'samplerate', 'speexrate', 'jack', 'oss', 'pulse', 'upmix', 'vdownmix', 'default', 'hw:CARD=sndrpihifiberry,DEV=0', 'plughw:CARD=sndrpihifiberry,DEV=0', 'sysdefault:CARD=sndrpihifiberry', 'dmix:CARD=sndrpihifiberry,DEV=0', 'usbstream:CARD=sndrpihifiberry', 'hw:CARD=PureAudio,DEV=0', 'plughw:CARD=PureAudio,DEV=0', 'sysdefault:CARD=PureAudio', 'front:CARD=PureAudio,DEV=0', 'surround21:CARD=PureAudio,DEV=0', 'surround40:CARD=PureAudio,DEV=0', 'surround41:CARD=PureAudio,DEV=0', 'surround50:CARD=PureAudio,DEV=0', 'surround51:CARD=PureAudio,DEV=0', 'surround71:CARD=PureAudio,DEV=0', 'iec958:CARD=PureAudio,DEV=0', 'dmix:CARD=PureAudio,DEV=0', 'usbstream:CARD=PureAudio']
+2023-08-16 12:20:23,250 Trying Master
+2023-08-16 12:20:23,251 MixernameMasterselected
+2023-08-16 12:20:23,269 Trying Capture
+2023-08-16 12:20:23,269 Initialized File Player

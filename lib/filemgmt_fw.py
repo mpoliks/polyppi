@@ -21,6 +21,7 @@ log_file = logs_dir + "log.log"
 class BootManager(object):
 
     def __init__(self):
+        global status
         for dir in [playback_dir, playback_backup_dir, recordings_dir, logs_dir]:
             if not os.path.exists(dir):
                 os.makedirs(dir)
@@ -30,33 +31,36 @@ class BootManager(object):
         logging.info("PID = " + str(os.getpid()))
 
     def wipe(self):
-        logging.info("Wiping Everything")
+        logging.info("Wiping Recordings and Logs")
         try: 
-            for f in os.listdir(playback_dir):
-                os.remove(str(os.path.join(playback_dir, f)))
             for f in os.listdir(recordings_dir):
-                os.remove(str(os.path.join(recordings_dir, f)))
+                os.remove((os.path.join(recordings_dir, f)))
             with open(log_file, "w"): pass
         except OSError as e:
             logging.error( "(%d) Error wiping files: %s"%(e))
             
     def populate(self, drive, led):
-        drive.file_download(download_folder, playback_dir)
-        try: 
-            #logging.log("Downloading Files")
-            #logging.log("Transferring Backups")
-            #for f in os.listdir(playback_backup_dir):
-                #os.remove(os.path.join(dir, f))
-            for f in os.listdir(playback_dir):
-                shutil.copy(f, playback_backup_dir)
-        except: 
+        try:
+            drive.file_download(download_folder, playback_dir)
+            drive.backup_audio()
+        except:
             logging.error("No GDrive Connection")
-            test_mode = True
-            led.update("err")
-            for f in os.listdir(playback_backup_dir):
-                shutil.copy(f, playback_dir)
-            logging.error("Restoring Base Playback Files")
-        return "ready"
+            
+        # try: 
+            # logging.log("Downloading Files")
+            # logging.log("Transferring Backups")
+            # for f in os.listdir(playback_backup_dir):
+                # os.remove(os.path.join(playback_backup_dir, f))
+            # for f in os.listdir(playback_dir):
+                # shutil.copy(f, playback_backup_dir)
+        # except: 
+            # logging.error("No GDrive Connection")
+            # test_mode = True
+            # led.update("err")
+            # for f in os.listdir(playback_backup_dir):
+                # shutil.copy(f, playback_dir)
+            #logging.error("Restoring Base Playback Files")
+        status = "ready"
 
     def stall(self, listener, player):
         if listener.is_streaming(): 
@@ -68,7 +72,7 @@ class BootManager(object):
             try: player.killStream()
             except IOError as e:
                 logging.error ( "(%d) Error stopping listener: %s"%(e))
-        return "holding"
+        status = "holding"
     
     def pull_vitals(self, listener, player, battery):
         try:
@@ -107,12 +111,34 @@ class GDriveSetup(object):
         
     def file_download(self, folder_id, target_folder):
         file_list = self.drive.ListFile({'q': "'{}' in parents and trashed = false".format(folder_id)}).GetList()
-        logging.info(file_list)
-        for i, file1 in enumerate(sorted(file_list, key = lambda x: x['title']), start = 1):
-            logging.info('Downloading {} from GDrive({}/{})'.format(file1['title'], i, len(file_list)))
-            file1.GetContentFile(file1['title'])
-            os.rename((target_folder.replace("playback/", file1['title'])), (target_folder + file1['title']))
+        title_list = []
+        for entry in file_list:
+            title_list.append(entry['title'])
+        to_download = set(title_list) - set(os.listdir(playback_dir))
+        logging.info("Will Download the Files {}".format(to_download))
+        to_remove = set(os.listdir(playback_dir)) - set(title_list)
+        logging.info("Removing Old Files {}".format(to_remove))
+        for i, entry in enumerate(file_list, start = 1):
+            if entry['title'] in to_download:
+                logging.info('Downloading {} from GDrive({}/{})'.format(entry['title'], i, len(to_download)))
+                entry.GetContentFile(entry['title'])
+                os.rename((target_folder.replace("playback/", entry['title'])), (target_folder + entry['title']))
+        for entry in os.listdir(playback_dir):
+            if entry in to_remove:
+                os.remove(os.path.join(playback_dir, entry))
         logging.info("Download Complete")
+    
+    def backup_audio(self):
+        to_backup = set(os.listdir(playback_dir)) - set(os.listdir(playback_backup_dir))
+        logging.info("Backing Up Files {}".format(to_backup))
+        to_remove = set(os.listdir(playback_backup_dir)) - set(os.listdir(playback_dir))
+        logging.info("Removing False Backups {}".format(to_remove))
+        for entry in os.listdir(playback_dir):
+            if entry in to_backup:
+                shutil.move(os.path.join(playback_dir, entry), playback_backup_dir)
+        for entry in os.listdir(playback_backup_dir):
+            if entry in to_remove:
+                os.remove(os.path.join(playback_backup_dir, entry))
 
     def upload_logs(self):
         fileindex = self.logs_dir + "/" + self.pi_id + str(datetime.now()) + ".log"
