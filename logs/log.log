@@ -1,24 +1,249 @@
-2023-08-16 12:20:22,538 PID = 2674
-2023-08-16 12:20:22,580 Initializing LEDs
-2023-08-16 12:20:22,622 Initializing Battery
-2023-08-16 12:20:22,644 OK: Battery Initialized Correctly
-2023-08-16 12:20:22,644 Setting Up GDrive
-2023-08-16 12:20:22,644 Initial Authorizing
-2023-08-16 12:20:22,649 Authorizing
-2023-08-16 12:20:22,653 file_cache is only supported with oauth2client<4.0.0
-2023-08-16 12:20:22,661 Accessing Google Drive
-2023-08-16 12:20:22,661 Wiping Filesystem and Downloading
-2023-08-16 12:20:22,687 URL being requested: GET https://www.googleapis.com/drive/v2/files?q=%27101FNH6ERnutThe6ztVLF8U11UnT5fybD%27+in+parents+and+trashed+%3D+false&maxResults=1000&alt=json
-2023-08-16 12:20:23,040 Will Download the Files set()
-2023-08-16 12:20:23,041 Removing Old Files set()
-2023-08-16 12:20:23,041 Download Complete
-2023-08-16 12:20:23,041 Listener Initialized
-2023-08-16 12:20:23,178 No preferred input found; using default input device.
-2023-08-16 12:20:23,179 Initializing Mixer
-2023-08-16 12:20:23,197 ['Master', 'Capture']
-2023-08-16 12:20:23,199 ['sndrpihifiberry', 'PureAudio']
-2023-08-16 12:20:23,234 ['null', 'lavrate', 'samplerate', 'speexrate', 'jack', 'oss', 'pulse', 'upmix', 'vdownmix', 'default', 'hw:CARD=sndrpihifiberry,DEV=0', 'plughw:CARD=sndrpihifiberry,DEV=0', 'sysdefault:CARD=sndrpihifiberry', 'dmix:CARD=sndrpihifiberry,DEV=0', 'usbstream:CARD=sndrpihifiberry', 'hw:CARD=PureAudio,DEV=0', 'plughw:CARD=PureAudio,DEV=0', 'sysdefault:CARD=PureAudio', 'front:CARD=PureAudio,DEV=0', 'surround21:CARD=PureAudio,DEV=0', 'surround40:CARD=PureAudio,DEV=0', 'surround41:CARD=PureAudio,DEV=0', 'surround50:CARD=PureAudio,DEV=0', 'surround51:CARD=PureAudio,DEV=0', 'surround71:CARD=PureAudio,DEV=0', 'iec958:CARD=PureAudio,DEV=0', 'dmix:CARD=PureAudio,DEV=0', 'usbstream:CARD=PureAudio']
-2023-08-16 12:20:23,250 Trying Master
-2023-08-16 12:20:23,251 MixernameMasterselected
-2023-08-16 12:20:23,269 Trying Capture
-2023-08-16 12:20:23,269 Initialized File Player
+2023-08-16 15:38:33,288 PID = 4095
+2023-08-16 15:38:33,329 Initializing LEDs
+2023-08-16 15:38:33,370 Initializing Battery
+2023-08-16 15:38:33,392 OK: Battery Initialized Correctly
+2023-08-16 15:38:33,392 Setting Up GDrive
+2023-08-16 15:38:33,392 Initial Authorizing
+2023-08-16 15:38:33,397 Authorizing
+2023-08-16 15:38:33,400 file_cache is only supported with oauth2client<4.0.0
+2023-08-16 15:38:33,409 Accessing Google Drive
+2023-08-16 15:38:33,436 URL being requested: GET https://www.googleapis.com/drive/v2/files?q=%27101FNH6ERnutThe6ztVLF8U11UnT5fybD%27+in+parents+and+trashed+%3D+false&maxResults=1000&alt=json
+2023-08-16 15:38:33,770 Will Download the Files set()
+2023-08-16 15:38:33,771 Removing Old Files set()
+2023-08-16 15:38:33,771 Download Complete
+2023-08-16 15:38:33,771 Backing Up Files set()
+2023-08-16 15:38:33,771 Removing False Backups set()
+2023-08-16 15:38:33,771 Listener Initialized
+2023-08-16 15:38:33,917 No preferred input found; using default input device.
+2023-08-16 15:38:33,918 Initializing Mixer
+2023-08-16 15:38:33,934 ['Master', 'Capture']
+2023-08-16 15:38:33,936 ['sndrpihifiberry', 'PureAudio']
+2023-08-16 15:38:33,986 ['null', 'lavrate', 'samplerate', 'speexrate', 'jack', 'oss', 'pulse', 'upmix', 'vdownmix', 'default', 'hw:CARD=sndrpihifiberry,DEV=0', 'plughw:CARD=sndrpihifiberry,DEV=0', 'sysdefault:CARD=sndrpihifiberry', 'dmix:CARD=sndrpihifiberry,DEV=0', 'usbstream:CARD=sndrpihifiberry', 'hw:CARD=PureAudio,DEV=0', 'plughw:CARD=PureAudio,DEV=0', 'sysdefault:CARD=PureAudio', 'front:CARD=PureAudio,DEV=0', 'surround21:CARD=PureAudio,DEV=0', 'surround40:CARD=PureAudio,DEV=0', 'surround41:CARD=PureAudio,DEV=0', 'surround50:CARD=PureAudio,DEV=0', 'surround51:CARD=PureAudio,DEV=0', 'surround71:CARD=PureAudio,DEV=0', 'iec958:CARD=PureAudio,DEV=0', 'dmix:CARD=PureAudio,DEV=0', 'usbstream:CARD=PureAudio']
+2023-08-16 15:38:34,000 Trying Master
+2023-08-16 15:38:34,000 MixernameMasterselected
+2023-08-16 15:38:34,014 Trying Capture
+2023-08-16 15:38:34,014 Initialized File Player
+2023-08-16 15:38:35,016 Successfully Started Running
+2023-08-16 15:38:35,016 Charge Change Detected, Status = listening
+2023-08-16 15:38:35,574 Resetting Listening Count
+2023-08-16 15:38:36,137 Resetting Listening Count
+2023-08-16 15:38:36,657 Resetting Listening Count
+2023-08-16 15:38:37,183 Resetting Listening Count
+2023-08-16 15:38:37,706 New RMS Thresh to 0.0018135979455848447
+2023-08-16 15:38:37,707 Resetting Listening Count
+2023-08-16 15:38:38,229 New RMS Thresh to 0.0017730071256653406
+2023-08-16 15:38:38,230 Resetting Listening Count
+2023-08-16 15:38:38,753 New RMS Thresh to 0.0017377609040955559
+2023-08-16 15:38:38,754 Resetting Listening Count
+2023-08-16 15:38:39,273 New RMS Thresh to 0.001749384332045275
+2023-08-16 15:38:39,275 Resetting Listening Count
+2023-08-16 15:38:39,798 New RMS Thresh to 0.0017201258699704053
+2023-08-16 15:38:39,799 Resetting Listening Count
+2023-08-16 15:38:40,321 New RMS Thresh to 0.001712438308881532
+2023-08-16 15:38:40,322 Resetting Listening Count
+2023-08-16 15:38:40,845 New RMS Thresh to 0.0016759923329676732
+2023-08-16 15:38:40,846 Resetting Listening Count
+2023-08-16 15:38:41,367 New RMS Thresh to 0.0016599299552946501
+2023-08-16 15:38:41,368 Resetting Listening Count
+2023-08-16 15:38:41,889 New RMS Thresh to 0.0016551113167214016
+2023-08-16 15:38:41,891 Resetting Listening Count
+2023-08-16 15:38:42,413 New RMS Thresh to 0.0016410843552637955
+2023-08-16 15:38:42,414 Resetting Listening Count
+2023-08-16 15:38:42,938 New RMS Thresh to 0.0016226367670150901
+2023-08-16 15:38:42,939 Resetting Listening Count
+2023-08-16 15:38:43,460 New RMS Thresh to 0.0015998552356424145
+2023-08-16 15:38:43,461 Resetting Listening Count
+2023-08-16 15:38:43,985 New RMS Thresh to 0.00158765784265036
+2023-08-16 15:38:43,987 Resetting Listening Count
+2023-08-16 15:38:44,506 New RMS Thresh to 0.0015812238455729921
+2023-08-16 15:38:44,507 Resetting Listening Count
+2023-08-16 15:38:45,032 New RMS Thresh to 0.00163254955989208
+2023-08-16 15:38:45,033 *--polling for sustained signal 1 / 2--*
+2023-08-16 15:38:45,556 New RMS Thresh to 0.0016163287428552554
+2023-08-16 15:38:45,557 *--polling for sustained signal 2 / 2--*
+2023-08-16 15:38:45,558 *--recording initiated--*
+2023-08-16 15:38:45,558 *--block 1/10--*
+2023-08-16 15:38:45,572 New RMS Thresh to 0.0016574627693312254
+2023-08-16 15:38:45,573 *--block 2/10--*
+2023-08-16 15:38:46,092 New RMS Thresh to 0.001717960484013849
+2023-08-16 15:38:46,094 *--block 3/10--*
+2023-08-16 15:38:46,616 New RMS Thresh to 0.0017244866114414644
+2023-08-16 15:38:46,618 *--block 4/10--*
+2023-08-16 15:38:47,137 New RMS Thresh to 0.0017142403265827187
+2023-08-16 15:38:47,138 *--block 5/10--*
+2023-08-16 15:38:47,663 New RMS Thresh to 0.0017082941751032762
+2023-08-16 15:38:47,664 *--block 6/10--*
+2023-08-16 15:38:48,184 New RMS Thresh to 0.0017467248924938705
+2023-08-16 15:38:48,185 *--block 7/10--*
+2023-08-16 15:38:48,707 New RMS Thresh to 0.0017348003600712394
+2023-08-16 15:38:48,708 *--block 8/10--*
+2023-08-16 15:38:49,231 New RMS Thresh to 0.0017393264623262706
+2023-08-16 15:38:49,233 *--block 9/10--*
+2023-08-16 15:38:49,753 New RMS Thresh to 0.0017281894729966056
+2023-08-16 15:38:49,754 *--block 10/10--*
+2023-08-16 15:38:50,280 New RMS Thresh to 0.0017290494574867755
+2023-08-16 15:38:50,281 *--block 11/10--*
+2023-08-16 15:38:50,282 Writing File
+2023-08-16 15:38:50,430 URL being requested: POST https://www.googleapis.com/upload/drive/v2/files?alt=json&uploadType=resumable
+2023-08-16 15:38:52,184 Recording Upload Complete
+2023-08-16 15:38:52,186 Removing Local Copy of /home/hydra/Desktop/polyppi/recordings/rec_1692214730.28269581.wav
+2023-08-16 15:38:52,208 New RMS Thresh to 0.0017248447869551025
+2023-08-16 15:38:52,210 Resetting Listening Count
+2023-08-16 15:38:52,229 New RMS Thresh to 0.00170811030971754
+2023-08-16 15:38:52,230 Resetting Listening Count
+2023-08-16 15:38:52,250 New RMS Thresh to 0.0017002262490065133
+2023-08-16 15:38:52,252 Resetting Listening Count
+2023-08-16 15:38:52,263 New RMS Thresh to 0.001695305423562902
+2023-08-16 15:38:52,264 Resetting Listening Count
+2023-08-16 15:38:52,774 New RMS Thresh to 0.0017004697305401959
+2023-08-16 15:38:52,774 Resetting Listening Count
+2023-08-16 15:38:53,293 New RMS Thresh to 0.001703853999628698
+2023-08-16 15:38:53,295 Resetting Listening Count
+2023-08-16 15:38:53,817 New RMS Thresh to 0.0017046540669241857
+2023-08-16 15:38:53,818 Resetting Listening Count
+2023-08-16 15:38:54,340 New RMS Thresh to 0.001641889497349972
+2023-08-16 15:38:54,341 Resetting Listening Count
+2023-08-16 15:38:54,863 New RMS Thresh to 0.0015952918460577694
+2023-08-16 15:38:54,864 Resetting Listening Count
+2023-08-16 15:38:55,386 New RMS Thresh to 0.0015312279513427425
+2023-08-16 15:38:55,387 Resetting Listening Count
+2023-08-16 15:38:55,911 New RMS Thresh to 0.0014580994358610148
+2023-08-16 15:38:55,912 Resetting Listening Count
+2023-08-16 15:38:56,435 New RMS Thresh to 0.0014363255712428644
+2023-08-16 15:38:56,436 Resetting Listening Count
+2023-08-16 15:38:56,958 New RMS Thresh to 0.0014230547252967252
+2023-08-16 15:38:56,959 Resetting Listening Count
+2023-08-16 15:38:57,481 New RMS Thresh to 0.0014107403806996905
+2023-08-16 15:38:57,482 Resetting Listening Count
+2023-08-16 15:38:58,004 New RMS Thresh to 0.0013585174914463915
+2023-08-16 15:38:58,005 Resetting Listening Count
+2023-08-16 15:38:58,526 New RMS Thresh to 0.001345884744459957
+2023-08-16 15:38:58,527 Resetting Listening Count
+2023-08-16 15:38:59,049 New RMS Thresh to 0.0013329125799466728
+2023-08-16 15:38:59,050 Resetting Listening Count
+2023-08-16 15:38:59,066 New RMS Thresh to 0.0013371559984262846
+2023-08-16 15:38:59,067 Resetting Listening Count
+2023-08-16 15:38:59,589 New RMS Thresh to 0.0013431619407463355
+2023-08-16 15:38:59,590 Resetting Listening Count
+2023-08-16 15:39:00,110 New RMS Thresh to 0.0013439981858085154
+2023-08-16 15:39:00,111 Resetting Listening Count
+2023-08-16 15:39:00,633 New RMS Thresh to 0.0013582469816066393
+2023-08-16 15:39:00,634 Resetting Listening Count
+2023-08-16 15:39:01,157 New RMS Thresh to 0.0013676371193371889
+2023-08-16 15:39:01,158 Resetting Listening Count
+2023-08-16 15:39:01,682 New RMS Thresh to 0.001379382176428746
+2023-08-16 15:39:01,684 Resetting Listening Count
+2023-08-16 15:39:02,203 New RMS Thresh to 0.0013867972201529475
+2023-08-16 15:39:02,204 Resetting Listening Count
+2023-08-16 15:39:02,726 New RMS Thresh to 0.0013785009080500195
+2023-08-16 15:39:02,727 Resetting Listening Count
+2023-08-16 15:39:03,250 New RMS Thresh to 0.0013665306220958706
+2023-08-16 15:39:03,251 Resetting Listening Count
+2023-08-16 15:39:03,773 New RMS Thresh to 0.0013597924883075234
+2023-08-16 15:39:03,774 Resetting Listening Count
+2023-08-16 15:39:04,299 New RMS Thresh to 0.001349065243788469
+2023-08-16 15:39:04,300 Resetting Listening Count
+2023-08-16 15:39:04,819 New RMS Thresh to 0.00135167705985531
+2023-08-16 15:39:04,820 Resetting Listening Count
+2023-08-16 15:39:05,343 New RMS Thresh to 0.0013528710432097189
+2023-08-16 15:39:05,344 Resetting Listening Count
+2023-08-16 15:39:05,866 New RMS Thresh to 0.0013589337769514033
+2023-08-16 15:39:05,867 Resetting Listening Count
+2023-08-16 15:39:06,391 New RMS Thresh to 0.0013664873809580893
+2023-08-16 15:39:06,392 Resetting Listening Count
+2023-08-16 15:39:06,915 New RMS Thresh to 0.001376873435184006
+2023-08-16 15:39:06,916 Resetting Listening Count
+2023-08-16 15:39:07,427 New RMS Thresh to 0.0013998827218180425
+2023-08-16 15:39:07,427 Resetting Listening Count
+2023-08-16 15:39:07,943 New RMS Thresh to 0.0014549816249650122
+2023-08-16 15:39:07,945 *--polling for sustained signal 1 / 2--*
+2023-08-16 15:39:08,471 New RMS Thresh to 0.0014657372212053903
+2023-08-16 15:39:08,472 Resetting Listening Count
+2023-08-16 15:39:08,995 New RMS Thresh to 0.0014558453702368916
+2023-08-16 15:39:08,997 Resetting Listening Count
+2023-08-16 15:39:09,518 New RMS Thresh to 0.0014561853893155284
+2023-08-16 15:39:09,519 Resetting Listening Count
+2023-08-16 15:39:10,041 New RMS Thresh to 0.0014504406396866078
+2023-08-16 15:39:10,042 Resetting Listening Count
+2023-08-16 15:39:10,563 New RMS Thresh to 0.0014406706997249618
+2023-08-16 15:39:10,565 Resetting Listening Count
+2023-08-16 15:39:10,578 New RMS Thresh to 0.0014304674702906093
+2023-08-16 15:39:10,579 Resetting Listening Count
+2023-08-16 15:39:11,099 New RMS Thresh to 0.0014187682324109218
+2023-08-16 15:39:11,100 Resetting Listening Count
+2023-08-16 15:39:11,624 New RMS Thresh to 0.0014145725645428556
+2023-08-16 15:39:11,625 Resetting Listening Count
+2023-08-16 15:39:12,146 New RMS Thresh to 0.0014162190573105361
+2023-08-16 15:39:12,147 Resetting Listening Count
+2023-08-16 15:39:12,671 New RMS Thresh to 0.00142168383669624
+2023-08-16 15:39:12,673 Resetting Listening Count
+2023-08-16 15:39:13,194 New RMS Thresh to 0.0014348726714921978
+2023-08-16 15:39:13,196 Resetting Listening Count
+2023-08-16 15:39:13,718 New RMS Thresh to 0.0014425974491227593
+2023-08-16 15:39:13,720 Resetting Listening Count
+2023-08-16 15:39:14,241 New RMS Thresh to 0.0014429974722335863
+2023-08-16 15:39:14,243 Resetting Listening Count
+2023-08-16 15:39:14,765 New RMS Thresh to 0.0019964150682050463
+2023-08-16 15:39:14,766 *--polling for sustained signal 1 / 2--*
+2023-08-16 15:39:15,285 New RMS Thresh to 0.0023744377717107128
+2023-08-16 15:39:15,287 *--polling for sustained signal 2 / 2--*
+2023-08-16 15:39:15,287 *--recording initiated--*
+2023-08-16 15:39:15,287 *--block 1/10--*
+2023-08-16 15:39:15,811 New RMS Thresh to 0.002800598253139491
+2023-08-16 15:39:15,812 *--block 2/10--*
+2023-08-16 15:39:16,390 New RMS Thresh to 0.003190599177068611
+2023-08-16 15:39:16,392 *--block 3/10--*
+2023-08-16 15:39:16,911 New RMS Thresh to 0.003686853194685355
+2023-08-16 15:39:16,913 *--block 4/10--*
+2023-08-16 15:39:17,437 New RMS Thresh to 0.004148274824918093
+2023-08-16 15:39:17,439 *--block 5/10--*
+2023-08-16 15:39:17,961 New RMS Thresh to 0.004561660194418214
+2023-08-16 15:39:17,962 *--block 6/10--*
+2023-08-16 15:39:18,484 New RMS Thresh to 0.004954785089586964
+2023-08-16 15:39:18,485 *--block 7/10--*
+2023-08-16 15:39:19,007 New RMS Thresh to 0.005261114253493804
+2023-08-16 15:39:19,008 *--block 8/10--*
+2023-08-16 15:39:19,530 New RMS Thresh to 0.00562577682307124
+2023-08-16 15:39:19,531 *--block 9/10--*
+2023-08-16 15:39:20,054 New RMS Thresh to 0.006013594057503193
+2023-08-16 15:39:20,056 *--block 10/10--*
+2023-08-16 15:39:20,075 New RMS Thresh to 0.006205099088127457
+2023-08-16 15:39:20,076 *--block 11/10--*
+2023-08-16 15:39:20,077 Writing File
+2023-08-16 15:39:20,145 URL being requested: POST https://www.googleapis.com/upload/drive/v2/files?alt=json&uploadType=resumable
+2023-08-16 15:39:22,126 Recording Upload Complete
+2023-08-16 15:39:22,128 Removing Local Copy of /home/hydra/Desktop/polyppi/recordings/rec_1692214760.07741522.wav
+2023-08-16 15:39:22,147 New RMS Thresh to 0.00620845069473458
+2023-08-16 15:39:22,148 Resetting Listening Count
+2023-08-16 15:39:22,165 New RMS Thresh to 0.006200995464326948
+2023-08-16 15:39:22,166 Resetting Listening Count
+2023-08-16 15:39:22,182 New RMS Thresh to 0.006196546457797803
+2023-08-16 15:39:22,184 Resetting Listening Count
+2023-08-16 15:39:22,201 New RMS Thresh to 0.006204387495007175
+2023-08-16 15:39:22,203 Resetting Listening Count
+2023-08-16 15:39:22,713 New RMS Thresh to 0.006199501177249218
+2023-08-16 15:39:22,716 Resetting Listening Count
+2023-08-16 15:39:23,231 New RMS Thresh to 0.006196512103380861
+2023-08-16 15:39:23,233 Resetting Listening Count
+2023-08-16 15:39:23,756 New RMS Thresh to 0.006221120622959978
+2023-08-16 15:39:23,758 Resetting Listening Count
+2023-08-16 15:39:24,269 New RMS Thresh to 0.005723369052506185
+2023-08-16 15:39:24,270 Resetting Listening Count
+2023-08-16 15:39:24,779 New RMS Thresh to 0.005355468255077852
+2023-08-16 15:39:24,779 Resetting Listening Count
+2023-08-16 15:39:25,288 New RMS Thresh to 0.004943633610331218
+2023-08-16 15:39:25,289 Resetting Listening Count
+2023-08-16 15:39:25,809 New RMS Thresh to 0.004667814286418241
+2023-08-16 15:39:25,810 Resetting Listening Count
+2023-08-16 15:39:26,333 New RMS Thresh to 0.004195167849086862
+2023-08-16 15:39:26,335 Resetting Listening Count
+2023-08-16 15:39:26,844 New RMS Thresh to 0.0037993542764933564
+2023-08-16 15:39:26,845 Resetting Listening Count
+2023-08-16 15:39:27,353 New RMS Thresh to 0.0034176670889741103
+2023-08-16 15:39:27,354 Resetting Listening Count
+2023-08-16 15:39:27,863 New RMS Thresh to 0.0030369622545465707
+2023-08-16 15:39:27,866 Resetting Listening Count
+2023-08-16 15:39:28,384 New RMS Thresh to 0.002729108154186893
+2023-08-16 15:39:28,385 Resetting Listening Count
+2023-08-16 15:39:28,896 New RMS Thresh to 0.0023934526255790837
+2023-08-16 15:39:28,897 Resetting Listening Count

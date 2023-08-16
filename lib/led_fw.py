@@ -16,7 +16,7 @@ class LED(object):
         blinkt.clear()
         blinkt.show()
 
-    def make_gaussian(fwhm):
+    def make_gaussian(self, fwhm):
         x = np.arange(0, blinkt.NUM_PIXELS, 1, float)
         y = x[:, np.newaxis]
         x0, y0 = 3.5, 3.5
@@ -56,7 +56,7 @@ class LED(object):
             case "recording":
                 if time.time() > self.nexttime:
                     for i in range(blinkt.NUM_PIXELS):
-                        blinkt.setpixel(i, 0, 0, random.randint(0, 255))
+                        blinkt.set_pixel(i, 0, 0, random.randint(0, 255))
                     blinkt.show()
                     self.nexttime = time.time() + random.randint(60, 150)
 

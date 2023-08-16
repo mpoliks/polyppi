@@ -1,0 +1,6 @@
+playback/
+playback_backup/
+recordings/
+logs/
+cred.txt
+client_secrets.json

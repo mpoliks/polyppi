@@ -44,22 +44,8 @@ class BootManager(object):
             drive.file_download(download_folder, playback_dir)
             drive.backup_audio()
         except:
-            logging.error("No GDrive Connection")
-            
-        # try: 
-            # logging.log("Downloading Files")
-            # logging.log("Transferring Backups")
-            # for f in os.listdir(playback_backup_dir):
-                # os.remove(os.path.join(playback_backup_dir, f))
-            # for f in os.listdir(playback_dir):
-                # shutil.copy(f, playback_backup_dir)
-        # except: 
-            # logging.error("No GDrive Connection")
-            # test_mode = True
-            # led.update("err")
-            # for f in os.listdir(playback_backup_dir):
-                # shutil.copy(f, playback_dir)
-            #logging.error("Restoring Base Playback Files")
+            logging.error("No GDrive Connection, Retoring Backups")
+            drive.restore_backups()
         status = "ready"
 
     def stall(self, listener, player):
@@ -121,6 +107,7 @@ class GDriveSetup(object):
         for i, entry in enumerate(file_list, start = 1):
             if entry['title'] in to_download:
                 logging.info('Downloading {} from GDrive({}/{})'.format(entry['title'], i, len(to_download)))
+                print('Downloading {} from GDrive({}/{})'.format(entry['title'], i, len(to_download)))
                 entry.GetContentFile(entry['title'])
                 os.rename((target_folder.replace("playback/", entry['title'])), (target_folder + entry['title']))
         for entry in os.listdir(playback_dir):
@@ -139,7 +126,20 @@ class GDriveSetup(object):
         for entry in os.listdir(playback_backup_dir):
             if entry in to_remove:
                 os.remove(os.path.join(playback_backup_dir, entry))
-
+                
+    def restore_backups(self):
+        if len(os.listdir(playback_dir)) > 2:
+            logging.info("Electing Not To Backup; Playback Dir Has Content")
+            return
+        if len(os.listdir(playback_backup_dir)) < 1:
+            logging.debug("Backup Dir Empty")
+            return
+        for f in os.listdir(playback_dir):
+            os.remove((os.path.join(playback_dir, f)))
+        for f in os.listdir(playback_backup_dir, f):
+            shutil.move(os.path.join(playback_backup_dir, entry), playback_dir)
+        logging.info("Restoring Backup")
+        
     def upload_logs(self):
         fileindex = self.logs_dir + "/" + self.pi_id + str(datetime.now()) + ".log"
         os.rename (self.logs_dir + "/log.log", fileindex)

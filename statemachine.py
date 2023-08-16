@@ -20,29 +20,27 @@ def setup():
     led.update("connecting")
     logging.info("Initializing Battery")
     battery = Battery(bus, address)
-    
-    logging.info("Setting Up GDrive")
-    gDrive = GDriveSetup()    
-    drive = gDrive.drive
-    logging.info("Wiping Filesystem and Downloading")
-    boot_manager.populate(gDrive, led)
 
     if not test_mode:
         try:
-            pass
+            logging.info("Setting Up GDrive")
+            gDrive = GDriveSetup()    
+            drive = gDrive.drive
             
         except:
             logging.error("No Internet Connection")
             test_mode = True
             led.update("err")
+    
+    boot_manager.populate(gDrive, led)
 
     listener = RMSListener(drive, upload_folder, test_mode)
     player = FilePlayback()
 
     if not test_mode: 
-        schedule.every().day.at("04:04").do(boot_manager.stall(listener, player))
-        schedule.every().day.at("04:08").do(boot_manager.wipe(drive, led))
-        schedule.every().minute.at(":55").do(boot_manager.pull_vitals(listener, player, battery))
+        schedule.every().day.at("04:04").do(boot_manager.stall, [listener, player])
+        schedule.every().day.at("04:08").do(boot_manager.wipe, [drive, led])
+        schedule.every().minute.at(":55").do(boot_manager.pull_vitals, [listener, player, battery])
         schedule.every().hour.do(gDrive.upload_logs, drive)
 
 

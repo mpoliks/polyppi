@@ -1,5 +1,7 @@
 import pyaudio, wave, alsaaudio
+from pydub import AudioSegment, effects  
 import math, struct, time, random
+from statistics import mean
 import os, logging
 
 ## Audio Settings
@@ -7,11 +9,15 @@ channels = 1
 sample_rate = 48000
 block_freq = 0.5 #frequency of input monitor
 frames_per_block = int(sample_rate*block_freq)
-rms_thresh = 0.25 #amp threshold over which presence is determined
+rms_thresh = 0.01 #amp threshold over which presence is determined
 rec_block_count = 2 #recording starts
 write_block_count = 10 #recording ends
 volume = 90 #volume in % of playback
 write_base = "rec_" #filename base for recordings
+dir_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+playback_dir = dir_path + "/playback/"
+playback_backup_dir = dir_path + "/playback_backup/"
+recordings_dir = dir_path + "/recordings/"
 
 def get_rms(block):
     count = len(block)/2
@@ -27,6 +33,7 @@ class RMSListener(object):
     def __init__(self, drive, drive_loc, to_upload):
         logging.info("Listener Initialized")
         self.frames = []
+        self.readings = []
         self.itercount = 0        
         self.rec_flag = 0
         self.rmscount = 0
@@ -35,6 +42,7 @@ class RMSListener(object):
         self.channels = channels
         self.rate = sample_rate
         self.fpb = frames_per_block
+        self.rms_thresh = rms_thresh
         self.write_base = write_base
         self.write_time = 0
         self.drive = drive
@@ -53,6 +61,15 @@ class RMSListener(object):
         
     def start(self):
         self.stream = self.open_mic_stream()
+        
+    def calibrate_rms(self, new_reading):
+        self.readings.append(new_reading)        
+        if len(self.readings) < 5:
+            return self.rms_thresh
+        if len(self.readings) >= 20:
+            self.readings.pop(0)
+        logging.info("New RMS Thresh to {}".format(mean(self.readings) * 1.4))
+        return mean(self.readings) * 1.4
 
     def find_input_device(self):
         device_index = None            
@@ -81,15 +98,16 @@ class RMSListener(object):
         try:
             block = self.stream.read(self.fpb, exception_on_overflow = False)
             amplitude = get_rms(block)
-            print(amplitude)               
-            if amplitude > rms_thresh and not self.rec_flag:
+            self.rms_thresh = self.calibrate_rms(amplitude)
+            print(amplitude)
+            if amplitude > self.rms_thresh and not self.rec_flag:
                 self.rmscount += 1
                 logging.debug("*--polling for sustained signal " + str(self.rmscount) + " / " + str(rec_block_count) + "--*")      
                 if self.rmscount >= rec_block_count:
                     logging.info("*--recording initiated--*")
                     self.rec_flag = 1
                     self.rmscount = 0                  
-            if amplitude < rms_thresh and not self.rec_flag:
+            if amplitude < self.rms_thresh and not self.rec_flag:
                 logging.debug("Resetting Listening Count")
                 self.rmscount = 0        
             if self.rec_flag:
@@ -97,6 +115,7 @@ class RMSListener(object):
                 self.frames.append( block )
                 logging.debug("*--block " + str(self.rmscount) + "/" + str(write_block_count) + "--*")                
             if self.rmscount > write_block_count:
+                logging.debug("Writing File")
                 self.itercount += 1
                 self.write_time = time.time()
                 self.record_kill()
@@ -108,17 +127,23 @@ class RMSListener(object):
             logging.error( "(%d) Error recording: %s"%(self.errorcount,e) )
     
     def postdata(self):
-        fileindex = "/home/marek/Desktop/polyppi/recordings/" + self.write_base + str(self.write_time) + str(self.itercount) + ".wav"
-        print(fileindex)
+        fileindex = recordings_dir + self.write_base + str(self.write_time) + str(self.itercount) + ".wav"
+        normalized_fileindex = recordings_dir + self.write_base + str(self.write_time) + str(self.itercount) + "norm.wav"
+        rawsound = AudioSegment.from_file(fileindex, "wav")
+        normalized_sound = effects.normalize(rawsound)
+        normalized_sound.export(normalized_fileindex, format="wav")
+        print(normalized_fileindex)
         if self.to_upload == True:
             file1 = self.drive.CreateFile({'parents': [{'id': self.upload_folder_id}]})
-            file1.SetContentFile(fileindex)
+            file1.SetContentFile(normalized_fileindex)
             file1.Upload()
             logging.info("Recording Upload Complete")
             os.remove(fileindex)
+            os.remove(normalized_fileindex)
+            logging.debug("Removing Local Copy of {}".format(fileindex))
         
     def record_kill(self):
-        wf = wave.open("/home/marek/Desktop/polyppi/recordings/" + self.write_base + str(self.write_time) + str(self.itercount) + ".wav", 'wb')
+        wf = wave.open(recordings_dir + self.write_base + str(self.write_time) + str(self.itercount) + ".wav", 'wb')
         wf.setnchannels(self.channels)
         wf.setsampwidth(self.pa.get_sample_size(self.audio_format))
         wf.setframerate(self.rate)
