@@ -10,9 +10,9 @@ sample_rate = 48000
 block_freq = 0.5 #frequency of input monitor
 frames_per_block = int(sample_rate*block_freq)
 rms_thresh = 0.01 #amp threshold over which presence is determined
-rec_block_count = 2 #recording starts
+rec_block_count = 3 #recording starts
 write_block_count = 10 #recording ends
-volume = 90 #volume in % of playback
+playback_volume = 90 #volume in % of playback
 write_base = "rec_" #filename base for recordings
 dir_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 playback_dir = dir_path + "/playback/"
@@ -51,6 +51,11 @@ class RMSListener(object):
         self.pa = pyaudio.PyAudio()
         self.device_index = self.find_input_device()
         self.stream = None
+        self.vitals = {
+            "recordings_triggered": 0,
+            "recordings_initiated": 0,
+            "recordings_uploaded": 0
+            }
 
     def stop(self):
         try:
@@ -68,8 +73,8 @@ class RMSListener(object):
             return self.rms_thresh
         if len(self.readings) >= 20:
             self.readings.pop(0)
-        logging.info("New RMS Thresh to {}".format(mean(self.readings) * 1.4))
-        return mean(self.readings) * 1.4
+        #logging.info("New RMS Thresh to {}".format(mean(self.readings) * 1.6))
+        return mean(self.readings) * 1.6
 
     def find_input_device(self):
         device_index = None            
@@ -103,28 +108,31 @@ class RMSListener(object):
             if amplitude > self.rms_thresh and not self.rec_flag:
                 self.rmscount += 1
                 logging.debug("*--polling for sustained signal " + str(self.rmscount) + " / " + str(rec_block_count) + "--*")      
+                self.vitals["recordings_triggered"] += 1
                 if self.rmscount >= rec_block_count:
                     logging.info("*--recording initiated--*")
+                    self.vitals["recordings_initiated"] += 1
                     self.rec_flag = 1
                     self.rmscount = 0                  
             if amplitude < self.rms_thresh and not self.rec_flag:
-                logging.debug("Resetting Listening Count")
+                #logging.debug("Resetting Listening Count")
                 self.rmscount = 0        
             if self.rec_flag:
                 self.rmscount += 1
                 self.frames.append( block )
                 logging.debug("*--block " + str(self.rmscount) + "/" + str(write_block_count) + "--*")                
             if self.rmscount > write_block_count:
-                logging.debug("Writing File")
+                logging.debug("Writing Audio File")
                 self.itercount += 1
                 self.write_time = time.time()
                 self.record_kill()
                 self.postdata()
+                self.vitals["recordings_uploaded"] += 1
                 self.rmscount = 0
                 self.rec_flag = 0
         except IOError as e:
             self.errorcount += 1
-            logging.error( "(%d) Error recording: %s"%(self.errorcount,e) )
+            logging.error( "(%d) Error Recording: %s"%(self.errorcount,e) )
     
     def postdata(self):
         fileindex = recordings_dir + self.write_base + str(self.write_time) + str(self.itercount) + ".wav"
@@ -172,16 +180,19 @@ class FilePlayback(object):
                 self.m = alsaaudio.Mixer(mixername)
         self.stream = None
         self.volume = None
+        self.vitals = {
+            "files_played": 0
+            }
         logging.info("Initialized File Player")
         
-    def play(self, playdir, playback_volume):
+    def play(self):
         logging.info("Starting Playback")
         self.volume = playback_volume
         logging.info (self.volume)
         logging.info(self.m)
         self.m.setvolume(self.volume)
-        logging.info("Selecting from " + str(playdir))
-        playfile = playdir + "/" + random.choice(os.listdir(playdir))
+        logging.info("Selecting from " + str(playback_dir))
+        playfile = playback_dir + "/" + random.choice(os.listdir(playback_dir))
         logging.info("Selected: " + str(playfile))
         self.wf = wave.open(playfile, 'rb')
         logging.info("Opened Playfile")

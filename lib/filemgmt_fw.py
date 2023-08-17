@@ -143,7 +143,7 @@ class GDriveSetup(object):
     def upload_logs(self):
         fileindex = self.logs_dir + "/" + self.pi_id + str(datetime.now()) + ".log"
         os.rename (self.logs_dir + "/log.log", fileindex)
-        print(fileindex)
+        logging.info("Uploading Logs")
         file1 = self.drive.CreateFile({'parents': [{'id': log_folder}]})
         file1.SetContentFile(fileindex)
         file1.Upload()

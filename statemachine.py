@@ -5,7 +5,7 @@ from lib.led_fw import *
 from lib.power_fw import *
 
 test_mode = False ## Test Mode disables connectivity.
-status = None
+status = None 
 
 def setup():
     
@@ -22,7 +22,7 @@ def setup():
     battery = Battery(bus, address)
 
     if not test_mode:
-        try:
+        try:    
             logging.info("Setting Up GDrive")
             gDrive = GDriveSetup()    
             drive = gDrive.drive
@@ -37,11 +37,12 @@ def setup():
     listener = RMSListener(drive, upload_folder, test_mode)
     player = FilePlayback()
 
-    if not test_mode: 
-        schedule.every().day.at("04:04").do(boot_manager.stall, [listener, player])
-        schedule.every().day.at("04:08").do(boot_manager.wipe, [drive, led])
-        schedule.every().minute.at(":55").do(boot_manager.pull_vitals, [listener, player, battery])
-        schedule.every().hour.do(gDrive.upload_logs, drive)
+    if not test_mode:
+        schedule.every().day.at("04:04:01").do(boot_manager.stall, listener, player)
+        schedule.every().day.at("04:08:01").do(boot_manager.wipe, drive, led)
+        schedule.every().day.at("04:12:01").do(boot_manager.wipe, drive, led)
+        schedule.every().hour.at("56:01").do(boot_manager.pull_vitals, listener, player, battery)
+        schedule.every().hour.at("00:01").do(gDrive.upload_logs)
 
 
     time.sleep(1)
@@ -53,9 +54,10 @@ def loop(listener, player, led, battery, previous_status = None):
     
     global status
     time_threshold = 0
+    batt_level = 100
     
     while(1):
-        # make batt read only when status isn't holding
+        schedule.run_pending()
 
         match status:
 
@@ -83,20 +85,24 @@ def loop(listener, player, led, battery, previous_status = None):
                     player.vitals["files_played"] + 1
                     player.killStream()
                     player.play()
-                if battery.charge_level() >= 30: led.update("playing")
-                if battery.charge_level() < 30: led.update ("low_batt")
+                if batt_level >= 30: led.update("playing")
+                if batt_level < 30: led.update ("low_batt")
 
-        if (time.time() - time_threshold >= (0.2 * 1000)):     
+        if (time.time() - time_threshold >= 0.5):   
             time_threshold = time.time()
             try:
                 status = battery.charge_status()
             except:
-                logging.error("Battery Charge Read Failed")
+                logging.error("Battery Charge Detection Read Failed")
                 led.update("err")
             if status != previous_status:
                 logging.info("Charge Change Detected, Status = " + str(status))
                 battery.vitals["transition_events"] += 1
                 transition_flag = True
+            try:
+                batt_level = battery.charge_level()
+            except:
+                logging.error("Battery Charge Read Failed")
 
 
 if __name__ == "__main__":
