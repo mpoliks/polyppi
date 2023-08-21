@@ -64,13 +64,13 @@ class LED(object):
                 if time.time() > self.nexttime:
                     blinkt.set_all(128, 0, 0)
                     blinkt.show()
-                    self.nexttime = time.time() + 1000
+                    self.nexttime = time.time() + 5000
 
             case "low_batt":
                 if time.time() > self.nexttime:
                     blinkt.set_all(128, 0, 128)
                     blinkt.show()
-                    self.nexttime = time.time() + 1000
+                    self.nexttime = time.time() + 5000
 
             case "connecting":
                 blinkt.set_all(0, 128, 0)

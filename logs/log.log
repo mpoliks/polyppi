@@ -1,168 +1,30 @@
-2023-08-17 15:44:44,566 PID = 25336
-2023-08-17 15:44:44,607 Initializing LEDs
-2023-08-17 15:44:44,648 Initializing Battery
-2023-08-17 15:44:44,670 OK: Battery Initialized Correctly
-2023-08-17 15:44:44,670 Setting Up GDrive
-2023-08-17 15:44:44,671 Initial Authorizing
-2023-08-17 15:44:44,675 Authorizing
-2023-08-17 15:44:44,678 file_cache is only supported with oauth2client<4.0.0
-2023-08-17 15:44:44,688 Accessing Google Drive
-2023-08-17 15:44:44,715 URL being requested: GET https://www.googleapis.com/drive/v2/files?q=%27101FNH6ERnutThe6ztVLF8U11UnT5fybD%27+in+parents+and+trashed+%3D+false&maxResults=1000&alt=json
-2023-08-17 15:44:45,033 Will Download the Files set()
-2023-08-17 15:44:45,034 Removing Old Files set()
-2023-08-17 15:44:45,037 Download Complete
-2023-08-17 15:44:45,038 Backing Up Files set()
-2023-08-17 15:44:45,038 Removing False Backups set()
-2023-08-17 15:44:45,038 Listener Initialized
-2023-08-17 15:44:45,177 No preferred input found; using default input device.
-2023-08-17 15:44:45,177 Initializing Mixer
-2023-08-17 15:44:45,195 ['Master', 'Capture']
-2023-08-17 15:44:45,199 ['sndrpihifiberry', 'PureAudio']
-2023-08-17 15:44:45,239 ['null', 'lavrate', 'samplerate', 'speexrate', 'jack', 'oss', 'pulse', 'upmix', 'vdownmix', 'default', 'hw:CARD=sndrpihifiberry,DEV=0', 'plughw:CARD=sndrpihifiberry,DEV=0', 'sysdefault:CARD=sndrpihifiberry', 'dmix:CARD=sndrpihifiberry,DEV=0', 'usbstream:CARD=sndrpihifiberry', 'hw:CARD=PureAudio,DEV=0', 'plughw:CARD=PureAudio,DEV=0', 'sysdefault:CARD=PureAudio', 'front:CARD=PureAudio,DEV=0', 'surround21:CARD=PureAudio,DEV=0', 'surround40:CARD=PureAudio,DEV=0', 'surround41:CARD=PureAudio,DEV=0', 'surround50:CARD=PureAudio,DEV=0', 'surround51:CARD=PureAudio,DEV=0', 'surround71:CARD=PureAudio,DEV=0', 'iec958:CARD=PureAudio,DEV=0', 'dmix:CARD=PureAudio,DEV=0', 'usbstream:CARD=PureAudio']
-2023-08-17 15:44:45,258 Trying Master
-2023-08-17 15:44:45,258 MixernameMasterselected
-2023-08-17 15:44:45,274 Trying Capture
-2023-08-17 15:44:45,275 Initialized File Player
-2023-08-17 15:44:46,280 Successfully Started Running
-2023-08-17 15:44:46,283 Charge Change Detected, Status = listening
-2023-08-17 15:44:46,856 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:45:24,608 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:45:25,129 *--polling for sustained signal 2 / 3--*
-2023-08-17 15:45:25,653 *--polling for sustained signal 3 / 3--*
-2023-08-17 15:45:25,654 *--recording initiated--*
-2023-08-17 15:45:25,656 *--block 1/10--*
-2023-08-17 15:45:26,176 *--block 2/10--*
-2023-08-17 15:45:26,699 *--block 3/10--*
-2023-08-17 15:45:27,224 *--block 4/10--*
-2023-08-17 15:45:27,800 *--block 5/10--*
-2023-08-17 15:45:28,322 *--block 6/10--*
-2023-08-17 15:45:28,846 *--block 7/10--*
-2023-08-17 15:45:29,371 *--block 8/10--*
-2023-08-17 15:45:29,389 *--block 9/10--*
-2023-08-17 15:45:29,907 *--block 10/10--*
-2023-08-17 15:45:30,431 *--block 11/10--*
-2023-08-17 15:45:30,432 Writing Audio File
-2023-08-17 15:45:30,576 URL being requested: POST https://www.googleapis.com/upload/drive/v2/files?alt=json&uploadType=resumable
-2023-08-17 15:45:32,617 Recording Upload Complete
-2023-08-17 15:45:32,620 Removing Local Copy of /home/hydra/Desktop/polyppi/recordings/rec_1692301530.43284561.wav
-2023-08-17 15:45:52,069 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:45:52,595 *--polling for sustained signal 2 / 3--*
-2023-08-17 15:45:53,118 *--polling for sustained signal 3 / 3--*
-2023-08-17 15:45:53,119 *--recording initiated--*
-2023-08-17 15:45:53,119 *--block 1/10--*
-2023-08-17 15:45:53,641 *--block 2/10--*
-2023-08-17 15:45:54,164 *--block 3/10--*
-2023-08-17 15:45:54,688 *--block 4/10--*
-2023-08-17 15:45:55,209 *--block 5/10--*
-2023-08-17 15:45:55,734 *--block 6/10--*
-2023-08-17 15:45:56,258 *--block 7/10--*
-2023-08-17 15:45:56,779 *--block 8/10--*
-2023-08-17 15:45:57,304 *--block 9/10--*
-2023-08-17 15:45:57,828 *--block 10/10--*
-2023-08-17 15:45:58,351 *--block 11/10--*
-2023-08-17 15:45:58,352 Writing Audio File
-2023-08-17 15:45:58,445 URL being requested: POST https://www.googleapis.com/upload/drive/v2/files?alt=json&uploadType=resumable
-2023-08-17 15:46:00,520 Recording Upload Complete
-2023-08-17 15:46:00,523 Removing Local Copy of /home/hydra/Desktop/polyppi/recordings/rec_1692301558.35274172.wav
-2023-08-17 15:49:40,962 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:49:41,485 *--polling for sustained signal 2 / 3--*
-2023-08-17 15:49:47,244 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:51:50,558 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:51:51,081 *--polling for sustained signal 2 / 3--*
-2023-08-17 15:51:54,749 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:51:55,267 *--polling for sustained signal 2 / 3--*
-2023-08-17 15:52:32,017 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:52:33,062 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:53:23,996 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:53:24,522 *--polling for sustained signal 2 / 3--*
-2023-08-17 15:53:25,046 *--polling for sustained signal 3 / 3--*
-2023-08-17 15:53:25,046 *--recording initiated--*
-2023-08-17 15:53:25,047 *--block 1/10--*
-2023-08-17 15:53:25,568 *--block 2/10--*
-2023-08-17 15:53:26,092 *--block 3/10--*
-2023-08-17 15:53:26,616 *--block 4/10--*
-2023-08-17 15:53:27,139 *--block 5/10--*
-2023-08-17 15:53:27,662 *--block 6/10--*
-2023-08-17 15:53:28,186 *--block 7/10--*
-2023-08-17 15:53:28,708 *--block 8/10--*
-2023-08-17 15:53:29,231 *--block 9/10--*
-2023-08-17 15:53:29,756 *--block 10/10--*
-2023-08-17 15:53:30,278 *--block 11/10--*
-2023-08-17 15:53:30,279 Writing Audio File
-2023-08-17 15:53:30,374 URL being requested: POST https://www.googleapis.com/upload/drive/v2/files?alt=json&uploadType=resumable
-2023-08-17 15:53:32,316 Recording Upload Complete
-2023-08-17 15:53:32,318 Removing Local Copy of /home/hydra/Desktop/polyppi/recordings/rec_1692302010.27950533.wav
-2023-08-17 15:53:35,002 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:54:01,034 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:54:52,960 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:54:53,483 *--polling for sustained signal 2 / 3--*
-2023-08-17 15:55:11,815 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:55:52,700 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:55:53,222 *--polling for sustained signal 2 / 3--*
-2023-08-17 15:55:53,744 *--polling for sustained signal 3 / 3--*
-2023-08-17 15:55:53,745 *--recording initiated--*
-2023-08-17 15:55:53,745 *--block 1/10--*
-2023-08-17 15:55:54,267 *--block 2/10--*
-2023-08-17 15:55:54,793 *--block 3/10--*
-2023-08-17 15:55:55,317 *--block 4/10--*
-2023-08-17 15:55:55,842 *--block 5/10--*
-2023-08-17 15:55:56,350 *--block 6/10--*
-2023-08-17 15:55:56,873 *--block 7/10--*
-2023-08-17 15:55:57,383 *--block 8/10--*
-2023-08-17 15:55:57,906 *--block 9/10--*
-2023-08-17 15:55:58,497 *--block 10/10--*
-2023-08-17 15:55:58,523 *--block 11/10--*
-2023-08-17 15:55:58,524 Writing Audio File
-2023-08-17 15:55:58,595 URL being requested: POST https://www.googleapis.com/upload/drive/v2/files?alt=json&uploadType=resumable
-2023-08-17 15:56:00,426 Recording Upload Complete
-2023-08-17 15:56:00,427 Removing Local Copy of /home/hydra/Desktop/polyppi/recordings/rec_1692302158.52455764.wav
-2023-08-17 15:56:01,006 Running job Job(interval=1, unit=hours, do=pull_vitals, args=(<lib.audio_fw.RMSListener object at 0xb4b64990>, <lib.audio_fw.FilePlayback object at 0xb660bff0>, <lib.power_fw.Battery object at 0xb4b64ab0>), kwargs={})
-2023-08-17 15:56:01,008 VITALS: {'recordings_triggered': 27, 'recordings_initiated': 4, 'recordings_uploaded': 4}
-2023-08-17 15:56:01,009 VITALS: {'files_played': 0}
-2023-08-17 15:56:01,009 VITALS: {'charge_level': 100, 'transition_events': 1}
-2023-08-17 15:56:14,075 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:56:20,357 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:56:44,473 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:56:56,511 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:57:32,170 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:57:32,684 *--polling for sustained signal 2 / 3--*
-2023-08-17 15:57:33,203 *--polling for sustained signal 3 / 3--*
-2023-08-17 15:57:33,203 *--recording initiated--*
-2023-08-17 15:57:33,204 *--block 1/10--*
-2023-08-17 15:57:33,733 *--block 2/10--*
-2023-08-17 15:57:34,241 *--block 3/10--*
-2023-08-17 15:57:34,750 *--block 4/10--*
-2023-08-17 15:57:35,263 *--block 5/10--*
-2023-08-17 15:57:35,782 *--block 6/10--*
-2023-08-17 15:57:36,301 *--block 7/10--*
-2023-08-17 15:57:36,815 *--block 8/10--*
-2023-08-17 15:57:37,332 *--block 9/10--*
-2023-08-17 15:57:37,849 *--block 10/10--*
-2023-08-17 15:57:38,369 *--block 11/10--*
-2023-08-17 15:57:38,370 Writing Audio File
-2023-08-17 15:57:38,459 URL being requested: POST https://www.googleapis.com/upload/drive/v2/files?alt=json&uploadType=resumable
-2023-08-17 15:57:40,465 Recording Upload Complete
-2023-08-17 15:57:40,470 Removing Local Copy of /home/hydra/Desktop/polyppi/recordings/rec_1692302258.37053325.wav
-2023-08-17 15:59:12,053 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:59:12,556 *--polling for sustained signal 2 / 3--*
-2023-08-17 15:59:13,074 *--polling for sustained signal 3 / 3--*
-2023-08-17 15:59:13,075 *--recording initiated--*
-2023-08-17 15:59:13,077 *--block 1/10--*
-2023-08-17 15:59:13,600 *--block 2/10--*
-2023-08-17 15:59:14,122 *--block 3/10--*
-2023-08-17 15:59:14,647 *--block 4/10--*
-2023-08-17 15:59:15,167 *--block 5/10--*
-2023-08-17 15:59:15,694 *--block 6/10--*
-2023-08-17 15:59:16,217 *--block 7/10--*
-2023-08-17 15:59:16,740 *--block 8/10--*
-2023-08-17 15:59:17,263 *--block 9/10--*
-2023-08-17 15:59:17,785 *--block 10/10--*
-2023-08-17 15:59:18,308 *--block 11/10--*
-2023-08-17 15:59:18,309 Writing Audio File
-2023-08-17 15:59:18,382 URL being requested: POST https://www.googleapis.com/upload/drive/v2/files?alt=json&uploadType=resumable
-2023-08-17 15:59:20,597 Recording Upload Complete
-2023-08-17 15:59:20,600 Removing Local Copy of /home/hydra/Desktop/polyppi/recordings/rec_1692302358.30930476.wav
-2023-08-17 15:59:24,839 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:59:30,611 *--polling for sustained signal 1 / 3--*
-2023-08-17 15:59:42,679 *--polling for sustained signal 1 / 3--*
-2023-08-17 16:00:01,495 Running job Job(interval=1, unit=hours, do=upload_logs, args=(<pydrive.drive.GoogleDrive object at 0xb501a4f0>,), kwargs={})
+2023-08-21 13:46:58,529 PID = 1488
+2023-08-21 13:46:58,570 Initializing LEDs
+2023-08-21 13:46:58,613 Initializing Battery
+2023-08-21 13:46:58,635 OK: Battery Initialized Correctly
+2023-08-21 13:46:58,636 Setting Up GDrive
+2023-08-21 13:46:58,636 Initial Authorizing
+2023-08-21 13:46:58,646 access_token is expired. Now: 2023-08-21 17:46:58.646291, token_expiry: 2023-08-21 15:23:29
+2023-08-21 13:46:58,648 Refreshing access_token
+2023-08-21 13:46:58,933 Access Token Expired
+2023-08-21 13:46:58,935 Accessing Google Drive
+2023-08-21 13:46:58,943 file_cache is only supported with oauth2client<4.0.0
+2023-08-21 13:46:58,988 URL being requested: GET https://www.googleapis.com/drive/v2/files?q=%27101FNH6ERnutThe6ztVLF8U11UnT5fybD%27+in+parents+and+trashed+%3D+false&maxResults=1000&alt=json
+2023-08-21 13:46:59,468 Will Download the Files set()
+2023-08-21 13:46:59,469 Removing Old Files set()
+2023-08-21 13:46:59,469 Download Complete
+2023-08-21 13:46:59,469 Backing Up Files set()
+2023-08-21 13:46:59,469 Removing False Backups set()
+2023-08-21 13:46:59,470 Listener Initialized
+2023-08-21 13:46:59,846 No preferred input found; using default input device.
+2023-08-21 13:46:59,846 Initializing Mixer
+2023-08-21 13:46:59,865 ['Master', 'Capture']
+2023-08-21 13:46:59,867 ['sndrpihifiberry', 'PureAudio']
+2023-08-21 13:46:59,900 ['null', 'lavrate', 'samplerate', 'speexrate', 'jack', 'oss', 'pulse', 'upmix', 'vdownmix', 'default', 'dmixer', 'hw:CARD=sndrpihifiberry,DEV=0', 'plughw:CARD=sndrpihifiberry,DEV=0', 'sysdefault:CARD=sndrpihifiberry', 'dmix:CARD=sndrpihifiberry,DEV=0', 'usbstream:CARD=sndrpihifiberry', 'hw:CARD=PureAudio,DEV=0', 'plughw:CARD=PureAudio,DEV=0', 'sysdefault:CARD=PureAudio', 'front:CARD=PureAudio,DEV=0', 'surround21:CARD=PureAudio,DEV=0', 'surround40:CARD=PureAudio,DEV=0', 'surround41:CARD=PureAudio,DEV=0', 'surround50:CARD=PureAudio,DEV=0', 'surround51:CARD=PureAudio,DEV=0', 'surround71:CARD=PureAudio,DEV=0', 'iec958:CARD=PureAudio,DEV=0', 'dmix:CARD=PureAudio,DEV=0', 'usbstream:CARD=PureAudio']
+2023-08-21 13:46:59,915 Trying Master
+2023-08-21 13:46:59,916 MixernameMasterselected
+2023-08-21 13:46:59,927 Trying Capture
+2023-08-21 13:46:59,927 Initialized File Player
+2023-08-21 13:47:00,929 Successfully Started Running
+2023-08-21 13:47:00,930 Charge Change Detected, Status = listening
+2023-08-21 13:47:00,931 Transitioning into Listening Mode

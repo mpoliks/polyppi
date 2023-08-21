@@ -21,53 +21,71 @@ log_file = logs_dir + "log.log"
 class BootManager(object):
 
     def __init__(self):
-        global status
+        self.status = None
+        global transition_flag
+        self.schedule_flag = True
         for dir in [playback_dir, playback_backup_dir, recordings_dir, logs_dir]:
             if not os.path.exists(dir):
                 os.makedirs(dir)
         with open(log_file, "w"): pass
         logging.basicConfig(filename='logs/log.log', format='%(asctime)s %(message)s', encoding='utf-8', level=logging.DEBUG)
-        self.wipe()
         logging.info("PID = " + str(os.getpid()))
-
-    def wipe(self):
-        logging.info("Wiping Recordings and Logs")
-        try: 
-            for f in os.listdir(recordings_dir):
-                os.remove((os.path.join(recordings_dir, f)))
-            with open(log_file, "w"): pass
-        except OSError as e:
-            logging.error( "(%d) Error wiping files: %s"%(e))
             
     def populate(self, drive, led):
-        try:
-            drive.file_download(download_folder, playback_dir)
-            drive.backup_audio()
-        except:
-            logging.error("No GDrive Connection, Retoring Backups")
-            drive.restore_backups()
-        status = "ready"
+        if self.schedule_flag == True:
+            print("Populating Files")
+            try:
+                drive.file_download(download_folder, playback_dir)
+                drive.backup_audio()
+            except:
+                logging.error("No GDrive Connection, Restoring Backups")
+                drive.restore_backups()
+                transition_flag = True
+            self.schedule_flag = False
+            self.status = "ready"
+            print("Files Populated")
 
     def stall(self, listener, player):
-        if listener.is_streaming(): 
-            try: 
-                listener.stop()
-            except IOError as e:
-                logging.error ( "(%d) Error stopping listener: %s"%(e))
-        if player.is_streaming(): 
-            try: player.killStream()
-            except IOError as e:
-                logging.error ( "(%d) Error stopping listener: %s"%(e))
-        status = "holding"
+        if self.schedule_flag == True:
+            print("Stalling")
+            if listener.is_streaming(): 
+                logging.info("Pausing Listener")
+                try: 
+                    listener.stop()
+                except IOError as e:
+                    logging.error ( "(%d) Error stopping listener: %s"%(e))
+            if player.is_streaming(): 
+                logging.info("Pausing Player")
+                try: player.killStream()
+                except IOError as e:
+                    logging.error ( "(%d) Error stopping listener: %s"%(e))
+            self.schedule_flag = False
+            self.status = "holding"
+            logging.info("Succesfully Stalled")
+            print("Stalled")
     
     def pull_vitals(self, listener, player, battery):
-        try:
-            battery.vitals["charge_level"] = battery.charge_level()
-        except IOError as e:
-            logging.error ( "(%d) Error getting battery charge: %s"%(e))
-        logging.info("VITALS: " + str(listener.vitals))
-        logging.info("VITALS: " + str(player.vitals)) 
-        logging.info("VITALS: " + str(battery.vitals))
+        if self.schedule_flag == True:
+            print("Pulling Vitals")
+            try:
+                battery.vitals["charge_level"] = battery.charge_level()
+            except IOError as e:
+                logging.error ( "(%d) Error getting battery charge: %s"%(e))
+            logging.info("VITALS: " + str(listener.vitals))
+            logging.info("VITALS: " + str(player.vitals)) 
+            logging.info("VITALS: " + str(battery.vitals))
+            print("Pulled Vitals")
+            self.schedule_flag = False
+    
+    def upload_logs(self, drive):
+        if self.schedule_flag == True:
+            print("Uploading Logs")
+            drive.upload_logs()
+            self.schedule_flag = False
+    
+    def reset(self):
+        print("Resetting Flag")
+        self.schedule_flag = True
 
 
 
@@ -142,10 +160,11 @@ class GDriveSetup(object):
         
     def upload_logs(self):
         fileindex = self.logs_dir + "/" + self.pi_id + str(datetime.now()) + ".log"
-        os.rename (self.logs_dir + "/log.log", fileindex)
+        shutil.copyfile(log_file, fileindex)
         logging.info("Uploading Logs")
         file1 = self.drive.CreateFile({'parents': [{'id': log_folder}]})
         file1.SetContentFile(fileindex)
         file1.Upload()
         logging.info("LogFile Upload Complete")
         os.remove(fileindex)
+

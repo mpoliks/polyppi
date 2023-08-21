@@ -38,35 +38,64 @@ def setup():
     player = FilePlayback()
 
     if not test_mode:
-        schedule.every().day.at("04:04:01").do(boot_manager.stall, listener, player)
-        schedule.every().day.at("04:08:01").do(boot_manager.wipe, drive, led)
-        schedule.every().day.at("04:12:01").do(boot_manager.wipe, drive, led)
-        schedule.every().hour.at("56:01").do(boot_manager.pull_vitals, listener, player, battery)
-        schedule.every().hour.at("00:01").do(gDrive.upload_logs)
-
+        schedule.every().hour.at(":20").do(boot_manager.reset)
+        schedule.every().hour.at(":21").do(boot_manager.pull_vitals, listener, player, battery)
+        schedule.every().hour.at(":22").do(boot_manager.reset)
+        schedule.every().hour.at(":23").do(boot_manager.upload_logs, gDrive)
+        schedule.every().hour.at(":24").do(boot_manager.reset)
+        schedule.every().day.at("00:25").do(boot_manager.stall, listener, player)
+        schedule.every().day.at("00:26").do(boot_manager.reset)
+        schedule.every().day.at("00:27").do(boot_manager.populate, gDrive, led)
+        schedule.every().day.at("00:28").do(boot_manager.reset)
 
     time.sleep(1)
-    return(listener, player, led, battery)
+    return(listener, player, led, battery, boot_manager)
 
 
 
-def loop(listener, player, led, battery, previous_status = None):
+def loop(listener, player, led, battery, boot_manager, previous_status = None):
     
     global status
     time_threshold = 0
     batt_level = 100
     
     while(1):
-        schedule.run_pending()
+        
+        #schedule.run_pending()
+        
+        if boot_manager.status == "holding": 
+            status = "holding"
+        if boot_manager.status != "holding":
+            if ((time.time() - time_threshold >= 1.0)):  
+                schedule.run_pending() 
+                #print(status)
+                time_threshold = time.time()
+                try:
+                    status = battery.charge_status()
+                except:
+                    logging.error("Battery Charge Detection Read Failed")
+                    led.update("err")
+                if status != previous_status:
+                    logging.info("Charge Change Detected, Status = " + str(status))
+                    battery.vitals["transition_events"] += 1
+                    transition_flag = True
+                try:
+                    batt_level = battery.charge_level()
+                except:
+                    logging.error("Battery Charge Read Failed")
 
         match status:
 
-            case "holding":
+            case "holding": 
+                transition_flag = True
+                
                 continue
 
             case "listening":
                 if transition_flag:
-                    while player.fadeOut() == False: pass
+                    if previous_status == "listening": 
+                        while player.fadeOut() == False: pass
+                    logging.info("Transitioning into Listening Mode")
                     previous_status = status
                     listener.start()
                     transition_flag = False
@@ -78,6 +107,7 @@ def loop(listener, player, led, battery, previous_status = None):
                 if transition_flag: 
                     if listener.is_streaming(): listener.stop()
                     previous_status = status
+                    logging.info("Transition into Playing Mode")
                     player.play()
                     transition_flag = False
                 if player.is_streaming() == False:
@@ -88,31 +118,15 @@ def loop(listener, player, led, battery, previous_status = None):
                 if batt_level >= 30: led.update("playing")
                 if batt_level < 30: led.update ("low_batt")
 
-        if (time.time() - time_threshold >= 0.5):   
-            time_threshold = time.time()
-            try:
-                status = battery.charge_status()
-            except:
-                logging.error("Battery Charge Detection Read Failed")
-                led.update("err")
-            if status != previous_status:
-                logging.info("Charge Change Detected, Status = " + str(status))
-                battery.vitals["transition_events"] += 1
-                transition_flag = True
-            try:
-                batt_level = battery.charge_level()
-            except:
-                logging.error("Battery Charge Read Failed")
-
 
 if __name__ == "__main__":
 
     print("*--HALTING TO ALLOW FOR CONNECTION TO COMPLETE--*")
-    listener, player, led, battery  = setup()
+    listener, player, led, battery, boot_manager  = setup()
 
     print("*--INITIALIZED AND RUNNING--*")
     logging.info("Successfully Started Running")
-    loop(listener, player, led, battery)
+    loop(listener, player, led, battery, boot_manager)
     
     
         

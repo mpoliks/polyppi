@@ -54,7 +54,8 @@ class RMSListener(object):
         self.vitals = {
             "recordings_triggered": 0,
             "recordings_initiated": 0,
-            "recordings_uploaded": 0
+            "recordings_uploaded": 0,
+            "err_count": 0
             }
 
     def stop(self):
@@ -132,7 +133,8 @@ class RMSListener(object):
                 self.rec_flag = 0
         except IOError as e:
             self.errorcount += 1
-            logging.error( "(%d) Error Recording: %s"%(self.errorcount,e) )
+            self.vitals["err_count"] = self.errorcount
+            #print( "(%d) Error Recording: %s"%(self.errorcount,e) )
     
     def postdata(self):
         fileindex = recordings_dir + self.write_base + str(self.write_time) + str(self.itercount) + ".wav"
