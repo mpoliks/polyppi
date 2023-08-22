@@ -61,14 +61,13 @@ def loop(listener, player, led, battery, boot_manager, previous_status = None):
     
     while(1):
         
-        #schedule.run_pending()
-        
         if boot_manager.status == "holding": 
             status = "holding"
+            schedule.run_pending()
+            
         if boot_manager.status != "holding":
             if ((time.time() - time_threshold >= 1.0)):  
                 schedule.run_pending() 
-                #print(status)
                 time_threshold = time.time()
                 try:
                     status = battery.charge_status()
@@ -101,7 +100,9 @@ def loop(listener, player, led, battery, boot_manager, previous_status = None):
                     transition_flag = False
                 listener.listen()
                 if listener.rec_flag == True: led.update("recording")
-                if listener.rec_flag == False: led.update("listening")
+                if listener.rec_flag == False: 
+                    if listener.rmscount == 0: led.update("listening")
+                    if listener.rmscount > 0: led.update("triggered")
             
             case "playing":
                 if transition_flag: 

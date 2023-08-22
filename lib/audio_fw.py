@@ -105,7 +105,7 @@ class RMSListener(object):
             block = self.stream.read(self.fpb, exception_on_overflow = False)
             amplitude = get_rms(block)
             self.rms_thresh = self.calibrate_rms(amplitude)
-            print(amplitude)
+            #print(amplitude)
             if amplitude > self.rms_thresh and not self.rec_flag:
                 self.rmscount += 1
                 logging.debug("*--polling for sustained signal " + str(self.rmscount) + " / " + str(rec_block_count) + "--*")      

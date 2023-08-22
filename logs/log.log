@@ -1,30 +1,47 @@
-2023-08-21 13:46:58,529 PID = 1488
-2023-08-21 13:46:58,570 Initializing LEDs
-2023-08-21 13:46:58,613 Initializing Battery
-2023-08-21 13:46:58,635 OK: Battery Initialized Correctly
-2023-08-21 13:46:58,636 Setting Up GDrive
-2023-08-21 13:46:58,636 Initial Authorizing
-2023-08-21 13:46:58,646 access_token is expired. Now: 2023-08-21 17:46:58.646291, token_expiry: 2023-08-21 15:23:29
-2023-08-21 13:46:58,648 Refreshing access_token
-2023-08-21 13:46:58,933 Access Token Expired
-2023-08-21 13:46:58,935 Accessing Google Drive
-2023-08-21 13:46:58,943 file_cache is only supported with oauth2client<4.0.0
-2023-08-21 13:46:58,988 URL being requested: GET https://www.googleapis.com/drive/v2/files?q=%27101FNH6ERnutThe6ztVLF8U11UnT5fybD%27+in+parents+and+trashed+%3D+false&maxResults=1000&alt=json
-2023-08-21 13:46:59,468 Will Download the Files set()
-2023-08-21 13:46:59,469 Removing Old Files set()
-2023-08-21 13:46:59,469 Download Complete
-2023-08-21 13:46:59,469 Backing Up Files set()
-2023-08-21 13:46:59,469 Removing False Backups set()
-2023-08-21 13:46:59,470 Listener Initialized
-2023-08-21 13:46:59,846 No preferred input found; using default input device.
-2023-08-21 13:46:59,846 Initializing Mixer
-2023-08-21 13:46:59,865 ['Master', 'Capture']
-2023-08-21 13:46:59,867 ['sndrpihifiberry', 'PureAudio']
-2023-08-21 13:46:59,900 ['null', 'lavrate', 'samplerate', 'speexrate', 'jack', 'oss', 'pulse', 'upmix', 'vdownmix', 'default', 'dmixer', 'hw:CARD=sndrpihifiberry,DEV=0', 'plughw:CARD=sndrpihifiberry,DEV=0', 'sysdefault:CARD=sndrpihifiberry', 'dmix:CARD=sndrpihifiberry,DEV=0', 'usbstream:CARD=sndrpihifiberry', 'hw:CARD=PureAudio,DEV=0', 'plughw:CARD=PureAudio,DEV=0', 'sysdefault:CARD=PureAudio', 'front:CARD=PureAudio,DEV=0', 'surround21:CARD=PureAudio,DEV=0', 'surround40:CARD=PureAudio,DEV=0', 'surround41:CARD=PureAudio,DEV=0', 'surround50:CARD=PureAudio,DEV=0', 'surround51:CARD=PureAudio,DEV=0', 'surround71:CARD=PureAudio,DEV=0', 'iec958:CARD=PureAudio,DEV=0', 'dmix:CARD=PureAudio,DEV=0', 'usbstream:CARD=PureAudio']
-2023-08-21 13:46:59,915 Trying Master
-2023-08-21 13:46:59,916 MixernameMasterselected
-2023-08-21 13:46:59,927 Trying Capture
-2023-08-21 13:46:59,927 Initialized File Player
-2023-08-21 13:47:00,929 Successfully Started Running
-2023-08-21 13:47:00,930 Charge Change Detected, Status = listening
-2023-08-21 13:47:00,931 Transitioning into Listening Mode
+2023-08-22 11:18:54,814 PID = 2710
+2023-08-22 11:18:54,855 Initializing LEDs
+2023-08-22 11:18:54,916 Initializing Battery
+2023-08-22 11:18:54,938 OK: Battery Initialized Correctly
+2023-08-22 11:18:54,939 Setting Up GDrive
+2023-08-22 11:18:54,939 Initial Authorizing
+2023-08-22 11:18:54,944 Authorizing
+2023-08-22 11:18:54,947 file_cache is only supported with oauth2client<4.0.0
+2023-08-22 11:18:54,957 Accessing Google Drive
+2023-08-22 11:18:54,984 URL being requested: GET https://www.googleapis.com/drive/v2/files?q=%27101FNH6ERnutThe6ztVLF8U11UnT5fybD%27+in+parents+and+trashed+%3D+false&maxResults=1000&alt=json
+2023-08-22 11:18:55,465 Will Download the Files set()
+2023-08-22 11:18:55,466 Removing Old Files set()
+2023-08-22 11:18:55,466 Download Complete
+2023-08-22 11:18:55,466 Backing Up Files set()
+2023-08-22 11:18:55,466 Removing False Backups set()
+2023-08-22 11:18:55,467 Listener Initialized
+2023-08-22 11:18:55,639 No preferred input found; using default input device.
+2023-08-22 11:18:55,639 Initializing Mixer
+2023-08-22 11:18:55,660 ['Master', 'Capture']
+2023-08-22 11:18:55,663 ['sndrpihifiberry', 'PureAudio']
+2023-08-22 11:18:55,696 ['null', 'lavrate', 'samplerate', 'speexrate', 'jack', 'oss', 'pulse', 'upmix', 'vdownmix', 'default', 'dmixer', 'hw:CARD=sndrpihifiberry,DEV=0', 'plughw:CARD=sndrpihifiberry,DEV=0', 'sysdefault:CARD=sndrpihifiberry', 'dmix:CARD=sndrpihifiberry,DEV=0', 'usbstream:CARD=sndrpihifiberry', 'hw:CARD=PureAudio,DEV=0', 'plughw:CARD=PureAudio,DEV=0', 'sysdefault:CARD=PureAudio', 'front:CARD=PureAudio,DEV=0', 'surround21:CARD=PureAudio,DEV=0', 'surround40:CARD=PureAudio,DEV=0', 'surround41:CARD=PureAudio,DEV=0', 'surround50:CARD=PureAudio,DEV=0', 'surround51:CARD=PureAudio,DEV=0', 'surround71:CARD=PureAudio,DEV=0', 'iec958:CARD=PureAudio,DEV=0', 'dmix:CARD=PureAudio,DEV=0', 'usbstream:CARD=PureAudio']
+2023-08-22 11:18:55,714 Trying Master
+2023-08-22 11:18:55,714 MixernameMasterselected
+2023-08-22 11:18:55,728 Trying Capture
+2023-08-22 11:18:55,728 Initialized File Player
+2023-08-22 11:18:56,730 Successfully Started Running
+2023-08-22 11:18:56,731 Charge Change Detected, Status = listening
+2023-08-22 11:18:56,732 Transitioning into Listening Mode
+2023-08-22 11:19:09,547 *--polling for sustained signal 1 / 3--*
+2023-08-22 11:19:10,122 *--polling for sustained signal 2 / 3--*
+2023-08-22 11:19:10,631 *--polling for sustained signal 3 / 3--*
+2023-08-22 11:19:10,631 *--recording initiated--*
+2023-08-22 11:19:10,631 *--block 1/10--*
+2023-08-22 11:19:11,206 *--block 2/10--*
+2023-08-22 11:19:11,719 *--block 3/10--*
+2023-08-22 11:19:12,239 *--block 4/10--*
+2023-08-22 11:19:12,762 *--block 5/10--*
+2023-08-22 11:19:12,769 *--block 6/10--*
+2023-08-22 11:19:13,286 *--block 7/10--*
+2023-08-22 11:19:13,807 *--block 8/10--*
+2023-08-22 11:19:14,320 *--block 9/10--*
+2023-08-22 11:19:14,831 *--block 10/10--*
+2023-08-22 11:19:15,340 *--block 11/10--*
+2023-08-22 11:19:15,341 Writing Audio File
+2023-08-22 11:19:15,452 URL being requested: POST https://www.googleapis.com/upload/drive/v2/files?alt=json&uploadType=resumable
+2023-08-22 11:19:18,536 Recording Upload Complete
+2023-08-22 11:19:18,537 Removing Local Copy of /home/hydra/Desktop/polyppi/recordings/rec_1692717555.34127241.wav
