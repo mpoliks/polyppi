@@ -140,7 +140,7 @@ class GDriveSetup(object):
         logging.info("Removing False Backups {}".format(to_remove))
         for entry in os.listdir(playback_dir):
             if entry in to_backup:
-                shutil.move(os.path.join(playback_dir, entry), playback_backup_dir)
+                shutil.copyfile(os.path.join(playback_dir, entry), playback_backup_dir)
         for entry in os.listdir(playback_backup_dir):
             if entry in to_remove:
                 os.remove(os.path.join(playback_backup_dir, entry))
@@ -155,7 +155,7 @@ class GDriveSetup(object):
         for f in os.listdir(playback_dir):
             os.remove((os.path.join(playback_dir, f)))
         for f in os.listdir(playback_backup_dir, f):
-            shutil.move(os.path.join(playback_backup_dir, entry), playback_dir)
+            shutil.copyfile(os.path.join(playback_backup_dir, entry), playback_dir)
         logging.info("Restoring Backup")
         
     def upload_logs(self):

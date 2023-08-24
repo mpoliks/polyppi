@@ -211,10 +211,11 @@ class FilePlayback(object):
         return(data, pyaudio.paContinue)
     
     def is_streaming(self):
-        if self.stream == None:
+        try:
+            if self.stream == None: return False
+            if self.stream.is_active(): return True
+        except OSError as e:
             return False
-        if self.stream.is_active():
-            return True
         return False
     
     def killStream(self):

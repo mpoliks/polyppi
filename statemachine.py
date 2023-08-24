@@ -87,7 +87,6 @@ def loop(listener, player, led, battery, boot_manager, previous_status = None):
 
             case "holding": 
                 transition_flag = True
-                
                 continue
 
             case "listening":
