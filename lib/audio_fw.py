@@ -144,10 +144,13 @@ class RMSListener(object):
         normalized_sound.export(normalized_fileindex, format="wav")
         print(normalized_fileindex)
         if self.to_upload == True:
-            file1 = self.drive.CreateFile({'parents': [{'id': self.upload_folder_id}]})
-            file1.SetContentFile(normalized_fileindex)
-            file1.Upload()
-            logging.info("Recording Upload Complete")
+            try:
+                file1 = self.drive.CreateFile({'parents': [{'id': self.upload_folder_id}]})
+                file1.SetContentFile(normalized_fileindex)
+                file1.Upload()
+                logging.info("Recording Upload Complete")
+            except:
+                logging.error("Could Not Upload File -- No Internet")
             os.remove(fileindex)
             os.remove(normalized_fileindex)
             logging.debug("Removing Local Copy of {}".format(fileindex))
