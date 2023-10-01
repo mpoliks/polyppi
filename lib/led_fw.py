@@ -14,7 +14,7 @@ class LED(object):
         self.hue = 0
         self.flag = False
         self.clear()
-        self.persist = True
+        self.persist = False
         self.previous_state = None
         t = Thread(target=self.update)
         t.start()

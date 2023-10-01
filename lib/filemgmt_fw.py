@@ -1,6 +1,6 @@
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
-import os, shutil, logging
+import os, shutil, logging, requests
 from datetime import datetime
 
 ## GDrive Management
@@ -10,7 +10,7 @@ upload_folder = '1R8iCvcadFcgn3KGWdO_O4vAN-qa_YGig'
 log_folder = '1_RQT4sVP3-KD6JX-G5wiDPwxYsPQ8y5O'
 
 ## Local File Management
-dir_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+dir_path = "/home/hydra/Desktop/polyppi"
 playback_dir = dir_path + "/playback/"
 playback_backup_dir = dir_path + "/playback_backup/"
 recordings_dir = dir_path + "/recordings/"
@@ -24,12 +24,23 @@ class BootManager(object):
         self.status = None
         global transition_flag
         self.schedule_flag = True
+        
+        logging.basicConfig(filename=log_file, format='%(asctime)s %(message)s', encoding='utf-8', level=logging.DEBUG)
+        logging.info("PID = " + str(os.getpid()))
+        
         for dir in [playback_dir, playback_backup_dir, recordings_dir, logs_dir]:
             if not os.path.exists(dir):
                 os.makedirs(dir)
+                logging.info("Made Dir {}".format(dir))
         with open(log_file, "w"): pass
-        logging.basicConfig(filename='logs/log.log', format='%(asctime)s %(message)s', encoding='utf-8', level=logging.DEBUG)
-        logging.info("PID = " + str(os.getpid()))
+
+        
+    def check_internet(self, timeout):
+        try:
+            requests.head('http://www.google.com/', timeout=timeout)
+            return True
+        except requests.ConnectionError:
+            return False
             
     def populate(self, drive, led):
         if self.schedule_flag == True:
@@ -162,9 +173,12 @@ class GDriveSetup(object):
         fileindex = self.logs_dir + "/" + self.pi_id + str(datetime.now()) + ".log"
         shutil.copyfile(log_file, fileindex)
         logging.info("Uploading Logs")
-        file1 = self.drive.CreateFile({'parents': [{'id': log_folder}]})
-        file1.SetContentFile(fileindex)
-        file1.Upload()
-        logging.info("LogFile Upload Complete")
+        try: 
+            file1 = self.drive.CreateFile({'parents': [{'id': log_folder}]})
+            file1.SetContentFile(fileindex)
+            file1.Upload()
+            logging.info("LogFile Upload Complete")
+        except:
+            logging.error("Internet Connection Timed Out")
         os.remove(fileindex)
 

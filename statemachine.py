@@ -1,4 +1,7 @@
-import os, shutil, logging, schedule, time
+#!/usr/bin/python
+
+import os, shutil
+import logging, schedule, time
 from lib.filemgmt_fw import *
 from lib.audio_fw import *
 from lib.led_fw import * 
@@ -16,10 +19,25 @@ def setup():
     
     boot_manager = BootManager()
     led = LED()
+    time.sleep(1)
     logging.info("Initializing LEDs")
     led.update("connecting")
     logging.info("Initializing Battery")
     battery = Battery(bus, address)
+    attempts = 0
+    
+    while True:
+        check = boot_manager.check_internet(1)
+        if check is True:
+            logging.info("Internet Successfully Resolved")
+            print("OK: Resolved Internet")
+            break
+        if check is False:
+            attempts += 1
+            logging.error("Failed to Resolve Internet, Attemt {}".format(attempts))
+            print("ERR: NO INTERNET! ATTEMPTING AGAIN")
+            time.sleep(5)
+            pass
 
     if not test_mode:
         try:    
