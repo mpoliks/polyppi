@@ -83,40 +83,38 @@ def loop(listener, player, led, battery, boot_manager, previous_status = None):
                 except:
                     logging.error("Battery Charge Read Failed")
 
-        match status:
+        if status == "holding": 
+            transition_flag = True
+            continue
 
-            case "holding": 
-                transition_flag = True
-                continue
-
-            case "listening":
-                if transition_flag:
-                    if previous_status == "listening": 
-                        while player.fadeOut() == False: pass
-                    logging.info("Transitioning into Listening Mode")
-                    previous_status = status
-                    listener.start()
-                    transition_flag = False
-                listener.listen()
-                if listener.rec_flag == True: led.update("recording")
-                if listener.rec_flag == False: 
-                    if listener.rmscount == 0: led.update("listening")
-                    if listener.rmscount > 0: led.update("triggered")
+        if status == "listening":
+            if transition_flag:
+                if previous_status == "listening": 
+                    while player.fadeOut() == False: pass
+                logging.info("Transitioning into Listening Mode")
+                previous_status = status
+                listener.start()
+                transition_flag = False
+            listener.listen()
+            if listener.rec_flag == True: led.update("recording")
+            if listener.rec_flag == False: 
+                if listener.rmscount == 0: led.update("listening")
+                if listener.rmscount > 0: led.update("triggered")
             
-            case "playing":
-                if transition_flag: 
-                    if listener.is_streaming(): listener.stop()
-                    previous_status = status
-                    logging.info("Transition into Playing Mode")
-                    player.play()
-                    transition_flag = False
-                if player.is_streaming() == False:
-                    logging.info("Looping Audio")
-                    player.vitals["files_played"] + 1
-                    player.killStream()
-                    player.play()
-                if batt_level >= 30: led.update("playing")
-                if batt_level < 30: led.update ("low_batt")
+        if status == "playing":
+            if transition_flag: 
+                if listener.is_streaming(): listener.stop()
+                previous_status = status
+                logging.info("Transition into Playing Mode")
+                player.play()
+                transition_flag = False
+            if player.is_streaming() == False:
+                logging.info("Looping Audio")
+                player.vitals["files_played"] + 1
+                player.killStream()
+                player.play()
+            if batt_level >= 30: led.update("playing")
+            if batt_level < 30: led.update ("low_batt")
 
 
 if __name__ == "__main__":

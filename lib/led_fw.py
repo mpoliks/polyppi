@@ -43,42 +43,40 @@ class LED(object):
     def run(self, state):
         
         while self.persist == True:
-        
-            match state:
 
-                case "listening":
-                    self.hue = int(time.time() * 100) % 360
-                    for x in range (8):
-                        offset = x * self.spacing
-                        h = ((self.hue + offset) % 360) / 360.0
-                        r, g, b = [int(c * 255) for c in colorsys.hsv_to_rgb(h, 1.0, 1.0)]
-                        blinkt.set_pixel(x, 0, g, 0)
+            if state == "listening":
+                self.hue = int(time.time() * 100) % 360
+                for x in range (8):
+                    offset = x * self.spacing
+                    h = ((self.hue + offset) % 360) / 360.0
+                    r, g, b = [int(c * 255) for c in colorsys.hsv_to_rgb(h, 1.0, 1.0)]
+                    blinkt.set_pixel(x, 0, g, 0)
+                blinkt.show()
+
+            if state == "recording":
+                if time.time() > self.nexttime:
+                    if self.flag == True:
+                        for i in range(8):
+                            blinkt.set_pixel(i, 0, 0, random.randint(0, 255))
+                    if self.flag == False:
+                        blinkt.set_all(0, 0,0)
+                    self.flag = not self.flag                      
                     blinkt.show()
-
-                case "recording":
-                    if time.time() > self.nexttime:
-                        if self.flag == True:
-                            for i in range(8):
-                                blinkt.set_pixel(i, 0, 0, random.randint(0, 255))
-                        if self.flag == False:
-                            blinkt.set_all(0, 0,0)
-                        self.flag = not self.flag                      
-                        blinkt.show()
-                        self.nexttime = time.time() + random.uniform(0.001, 0.05)
+                    self.nexttime = time.time() + random.uniform(0.001, 0.05)
                         
-                case "triggered":
-                    if time.time() > self.nexttime:
-                        blinkt.set_all(random.randint(0, 255), 0, random.randint(0, 255))                     
-                        blinkt.show()
-                        self.nexttime = time.time() + random.uniform(0.001, 0.05)            
-
-
-                case "low_batt":
-                    if time.time() > self.nexttime:
-                        blinkt.set_all(128, 0, 128)
-                        blinkt.show()
-                        self.nexttime = time.time() + 5000
-
-                case "connecting":
-                    blinkt.set_all(0, random.randint(0, 128), 0)
+            if state == "triggered":
+                if time.time() > self.nexttime:
+                    blinkt.set_all(random.randint(0, 255), 0, random.randint(0, 255))                     
                     blinkt.show()
+                    self.nexttime = time.time() + random.uniform(0.001, 0.05)            
+
+
+            if state == "low_batt":
+                if time.time() > self.nexttime:
+                    blinkt.set_all(128, 0, 128)
+                    blinkt.show()
+                    self.nexttime = time.time() + 5000
+
+            if state == "connecting":
+                blinkt.set_all(0, random.randint(0, 128), 0)
+                blinkt.show()
