@@ -1,8 +1,9 @@
 import pyaudio, wave, alsaaudio
 from pydub import AudioSegment, effects  
-import math, struct, time, random
+import math, struct, time, datetime, random
 from statistics import mean
 import os, logging
+
 
 ## Audio Settings
 channels = 1
@@ -10,73 +11,31 @@ sample_rate = 48000
 block_freq = 0.5 #frequency of input monitor
 frames_per_block = int(sample_rate*block_freq)
 rms_thresh = 0.01 #amp threshold over which presence is determined
-rec_block_count = 3 #recording starts
-write_block_count = 10 #recording ends
 playback_volume = 90 #volume in % of playback
-write_base = "rec_" #filename base for recordings
 dir_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-playback_dir = dir_path + "/playback/"
-playback_backup_dir = dir_path + "/playback_backup/"
-recordings_dir = dir_path + "/recordings/"
+playback_dir = dir_path + "/playback"
 
-def get_rms(block):
-    count = len(block)/2
-    format = "%dh"%(count)
-    shorts = struct.unpack(format, block )
-    sum_squares = 0.0
-    for sample in shorts:
-        n = sample * (1.0/32768.0)
-        sum_squares += n*n
-    return math.sqrt(sum_squares / count)
 
 class RMSListener(object):
-    def __init__(self, drive, drive_loc, to_upload):
+    def __init__(self):
         logging.info("Listener Initialized")
         self.frames = []
         self.readings = []
-        self.itercount = 0        
-        self.rec_flag = 0
         self.rmscount = 0
-        self.errorcount = 0        
+        self.rampcount = 0
+        self.ramping = "Waiting"
+        self.errorcount = 0    
+        self.volume = 0  
         self.audio_format = pyaudio.paInt16
         self.channels = channels
         self.rate = sample_rate
         self.fpb = frames_per_block
-        self.rms_thresh = rms_thresh
-        self.write_base = write_base
-        self.write_time = 0
-        self.drive = drive
-        self.upload_folder_id = drive_loc
-        self.to_upload = not to_upload        
+        self.rms_thresh = rms_thresh   
         self.pa = pyaudio.PyAudio()
         self.device_index = self.find_input_device()
-        self.stream = None
-        self.vitals = {
-            "recordings_triggered": 0,
-            "recordings_initiated": 0,
-            "recordings_uploaded": 0,
-            "err_count": 0
-            }
-
-    def stop(self):
-        try:
-            self.stream.close()
-        except IOError as e:
-            self.errorcount += 1
-            logging.error( "(%d) Error pausing stream: %s"%(self.errorcount,e) )
+        self.initialize_mixer()
+        self.start()
         
-    def start(self):
-        self.stream = self.open_mic_stream()
-        
-    def calibrate_rms(self, new_reading):
-        self.readings.append(new_reading)        
-        if len(self.readings) < 5:
-            return self.rms_thresh
-        if len(self.readings) >= 20:
-            self.readings.pop(0)
-        #logging.info("New RMS Thresh to {}".format(mean(self.readings) * 1.6))
-        return mean(self.readings) * 1.6
-
     def find_input_device(self):
         device_index = None            
         for i in range( self.pa.get_device_count() ):     
@@ -100,80 +59,7 @@ class RMSListener(object):
                               frames_per_buffer = self.fpb)
         return stream
 
-    def listen(self):
-        try:
-            block = self.stream.read(self.fpb, exception_on_overflow = False)
-            amplitude = get_rms(block)
-            self.rms_thresh = self.calibrate_rms(amplitude)
-            #print(amplitude)
-            if amplitude > self.rms_thresh and not self.rec_flag:
-                self.rmscount += 1
-                logging.debug("*--polling for sustained signal " + str(self.rmscount) + " / " + str(rec_block_count) + "--*")      
-                self.vitals["recordings_triggered"] += 1
-                if self.rmscount >= rec_block_count:
-                    logging.info("*--recording initiated--*")
-                    self.vitals["recordings_initiated"] += 1
-                    self.rec_flag = 1
-                    self.rmscount = 0                  
-            if amplitude < self.rms_thresh and not self.rec_flag:
-                #logging.debug("Resetting Listening Count")
-                self.rmscount = 0        
-            if self.rec_flag:
-                self.rmscount += 1
-                self.frames.append( block )
-                logging.debug("*--block " + str(self.rmscount) + "/" + str(write_block_count) + "--*")                
-            if self.rmscount > write_block_count:
-                logging.debug("Writing Audio File")
-                self.itercount += 1
-                self.write_time = time.time()
-                self.record_kill()
-                self.postdata()
-                self.vitals["recordings_uploaded"] += 1
-                self.rmscount = 0
-                self.rec_flag = 0
-        except IOError as e:
-            self.errorcount += 1
-            self.vitals["err_count"] = self.errorcount
-            #print( "(%d) Error Recording: %s"%(self.errorcount,e) )
-    
-    def postdata(self):
-        fileindex = recordings_dir + self.write_base + str(self.write_time) + str(self.itercount) + ".wav"
-        normalized_fileindex = recordings_dir + self.write_base + str(self.write_time) + str(self.itercount) + "norm.wav"
-        rawsound = AudioSegment.from_file(fileindex, "wav")
-        normalized_sound = effects.normalize(rawsound)
-        normalized_sound.export(normalized_fileindex, format="wav")
-        print(normalized_fileindex)
-        if self.to_upload == True:
-            try:
-                file1 = self.drive.CreateFile({'parents': [{'id': self.upload_folder_id}]})
-                file1.SetContentFile(normalized_fileindex)
-                file1.Upload()
-                logging.info("Recording Upload Complete")
-            except:
-                logging.error("Could Not Upload File -- No Internet")
-            os.remove(fileindex)
-            os.remove(normalized_fileindex)
-            logging.debug("Removing Local Copy of {}".format(fileindex))
-        
-    def record_kill(self):
-        wf = wave.open(recordings_dir + self.write_base + str(self.write_time) + str(self.itercount) + ".wav", 'wb')
-        wf.setnchannels(self.channels)
-        wf.setsampwidth(self.pa.get_sample_size(self.audio_format))
-        wf.setframerate(self.rate)
-        wf.writeframes(b''.join(self.frames))
-        wf.close()
-        self.frames = []
-        
-    def is_streaming(self):
-        if self.stream == None:
-            return False
-        if self.stream.is_active():
-            return True
-        return False    
-        
-        
-class FilePlayback(object):
-    def __init__(self):
+    def initialize_mixer(self):
         logging.info("Initializing Mixer")
         logging.info(alsaaudio.mixers())
         logging.info(alsaaudio.cards())
@@ -183,21 +69,109 @@ class FilePlayback(object):
             if str(mixername) == "Master" or str(mixername) == "PCM":
                 logging.info("Mixername" + str(mixername) + "selected")
                 self.m = alsaaudio.Mixer(mixername)
-        self.stream = None
-        self.volume = None
-        self.vitals = {
-            "files_played": 0
-            }
+        
+    def stop(self):
+        try:
+            self.stream.close()
+        except IOError as e:
+            self.errorcount += 1
+            logging.error( "(%d) Error pausing stream: %s"%(self.errorcount,e) )
+        
+    def start(self):
+        self.stream = self.open_mic_stream()
+            
+    def get_rms(self, block):
+        count = len(block)/2
+        format = "%dh"%(count)
+        shorts = struct.unpack(format, block )
+        sum_squares = 0.0
+        for sample in shorts:
+            n = sample * (1.0/32768.0)
+            sum_squares += n*n
+        return math.sqrt(sum_squares / count)
+
+    def calibrate_rms(self, new_reading):
+        self.readings.append(new_reading)        
+        if len(self.readings) < 5:
+            return self.rms_thresh
+        if len(self.readings) >= 20:
+            self.readings.pop(0)
+        return mean(self.readings) * 1.6
+
+    def listen(self):
+        try:
+            block = self.stream.read(self.fpb, exception_on_overflow = False)
+            amplitude = self.get_rms(block)
+            #print(amplitude)                
+            self.rms_thresh = self.calibrate_rms(amplitude)
+        except IOError as e:
+            self.errorcount += 1
+        if self.ramping != "Waiting":
+            self.ramp()
+            return "triggered"
+        if amplitude > self.rms_thresh: self.rmscount += 1
+        if amplitude < self.rms_thresh: self.rmscount = 0
+        if self.rmscount > 3: 
+            self.ramping = "Fadein"
+            logging.info("Event Detected, Fading In")
+            self.ramp()   
+            return "triggered"     
+        return "inert"
+            
+    def ramp(self):
+        if self.ramping == "Fadein": 
+            if self.volume < 90: self.volume += 3
+            if self.volume >= 90: 
+                self.ramping = "Fadeout"
+                logging.info("Fading Out")
+        if self.ramping == "Fadeout":
+            if self.volume > 10: self.volume -= 1
+            if self.volume <= 10: 
+                self.ramping = "Waiting"
+                self.rmscount = 0
+        self.m.setvolume(self.volume)
+        
+        
+    def is_streaming(self):
+        if self.stream == None:
+            return False
+        if self.stream.is_active():
+            return True
+        return False   
+        
+        
+class FilePlayback(object):
+    def __init__(self):
         logging.info("Initialized File Player")
+        self.play()
         
     def play(self):
         logging.info("Starting Playback")
-        self.volume = playback_volume
-        logging.info (self.volume)
-        logging.info(self.m)
-        self.m.setvolume(self.volume)
-        logging.info("Selecting from " + str(playback_dir))
-        playfile = playback_dir + "/" + random.choice(os.listdir(playback_dir))
+        vari = "/origin"
+        
+        if datetime.datetime.now().month == 10:
+            if datetime.datetime.now().day >= 25:
+                vari = "/first"
+        
+        if datetime.datetime.now().month == 11:
+            if datetime.datetime.now().day < 6:
+                vari = "/first"
+            if datetime.datetime.now().day >= 6:
+                vari = "/second"
+            if datetime.datetime.now().day >= 20:
+                vari = "/third"
+                
+        if datetime.datetime.now().month == 12:
+            if datetime.datetime.now().day <= 27:
+                vari = "/third"
+            if datetime.datetime.now().day > 27:
+                vari = "/fourth"
+            
+        if datetime.datetime.now().month < 10:
+                vari = "/fourth"
+                
+        logging.info("Selecting from " + str(playback_dir) + vari)
+        playfile = playback_dir + vari +"/" + random.choice(os.listdir(playback_dir + vari))
         logging.info("Selected: " + str(playfile))
         self.wf = wave.open(playfile, 'rb')
         logging.info("Opened Playfile")
@@ -208,10 +182,23 @@ class FilePlayback(object):
                               rate = self.wf.getframerate(),
                               output = True,
                               stream_callback = self.callback)
+                              
     
     def callback(self, in_data, frame_count, time_info, status):
         data = self.wf.readframes(frame_count)
         return(data, pyaudio.paContinue)
+        
+    def loop(self):
+        if self.is_streaming() == False:
+            logging.info("Looping")
+            self.killStream()
+            self.play()
+
+    def killStream(self):
+        logging.info ("Killing Playback Stream")
+        self.stream.stop_stream()
+        self.stream.close()
+        self.pa.terminate()
     
     def is_streaming(self):
         try:
@@ -220,20 +207,11 @@ class FilePlayback(object):
         except OSError as e:
             return False
         return False
+        
+
+
+
+
+        
     
-    def killStream(self):
-        logging.info ("Killing Playback Stream")
-        self.stream.stop_stream()
-        self.stream.close()
-        self.pa.terminate()
     
-    def fadeOut(self):
-        if self.volume == None:
-            return True
-        if self.volume != 0:
-            self.volume = self.volume - 5
-            self.m.setvolume(self.volume)
-            return False
-        else:
-            self.killStream()
-            return True

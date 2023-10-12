@@ -6,7 +6,7 @@ import random
 import numpy as np
 from threading import Thread
 
-class LED(object):
+class LEDController(object):
     
     def __init__(self):
         self.nexttime = time.time()
@@ -28,14 +28,10 @@ class LED(object):
         
         self.previous_state = state
         self.persist = False
-        
-        if state == "playing":
-            blinkt.set_all(128, 0, 0)
-            blinkt.show()
-            return
             
         time.sleep(0.06)
         self.persist = True
+        
         t = Thread(target = self.run, args = (state,))
 
         t.start()
@@ -44,41 +40,20 @@ class LED(object):
         
         while self.persist == True:
         
-            match state:
-
-                case "listening":
+                if state == "inert":
                     self.hue = int(time.time() * 100) % 360
                     for x in range (8):
                         offset = x * self.spacing
                         h = ((self.hue + offset) % 360) / 360.0
                         r, g, b = [int(c * 255) for c in colorsys.hsv_to_rgb(h, 1.0, 1.0)]
-                        blinkt.set_pixel(x, 0, g, 0)
+                        blinkt.set_pixel(x, g, g, g)
                     blinkt.show()
-
-                case "recording":
-                    if time.time() > self.nexttime:
-                        if self.flag == True:
-                            for i in range(8):
-                                blinkt.set_pixel(i, 0, 0, random.randint(0, 255))
-                        if self.flag == False:
-                            blinkt.set_all(0, 0,0)
-                        self.flag = not self.flag                      
-                        blinkt.show()
-                        self.nexttime = time.time() + random.uniform(0.001, 0.05)
                         
-                case "triggered":
+                if state == "triggered":
                     if time.time() > self.nexttime:
-                        blinkt.set_all(random.randint(0, 255), 0, random.randint(0, 255))                     
+                        temp = random.randint(0, 255)
+                        blinkt.set_all(temp, temp, temp)                     
                         blinkt.show()
                         self.nexttime = time.time() + random.uniform(0.001, 0.05)            
 
 
-                case "low_batt":
-                    if time.time() > self.nexttime:
-                        blinkt.set_all(128, 0, 128)
-                        blinkt.show()
-                        self.nexttime = time.time() + 5000
-
-                case "connecting":
-                    blinkt.set_all(0, random.randint(0, 128), 0)
-                    blinkt.show()
