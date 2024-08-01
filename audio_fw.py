@@ -115,6 +115,11 @@ def event_a():
             volume_level = (4 * t * (1 - t))  # Quadratic function normalized to peak at 1
             adjust_volume(volume_level)
             time.sleep(0.02)  # 20 ms
+
+        # Swell at the top
+        swell_duration = random.uniform(0.5, 2.0)  # Swell duration between 0.5 and 2 seconds
+        logger.debug(f"Swell duration at top: {swell_duration} seconds")
+        time.sleep(swell_duration)
         
         # Parabolic sweep down
         for i in range(steps):
@@ -124,7 +129,6 @@ def event_a():
             time.sleep(0.02)
     
     logger.info("Ending event A")
-
 
 def event_b():
     logger.info("Starting event B: plateau")
@@ -169,6 +173,11 @@ def event_c():
             adjust_volume(t)
             time.sleep(0.02)
         
+        # Pause at the top
+        swell_duration = random.uniform(1, 5)
+        logger.debug(f"Swell duration at top: {swell_duration} seconds")
+        time.sleep(swell_duration)
+
         # Downward sweep
         down_sweep = quadratic_adjustment(max_level, 0, duration, steps)
         for t in down_sweep:
@@ -182,6 +191,7 @@ def event_c():
             time.sleep(pause_duration)
 
     logger.info("Ending event C")
+
 
 def main():
     global player
