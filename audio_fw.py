@@ -68,7 +68,6 @@ class FilePlayback(object):
         self.m.setvolume(self.volume)
         logging.info("Selecting from " + str(AUDIO_DIR))
         playfile = AUDIO_DIR + "/" + random.choice(os.listdir(AUDIO_DIR))
-        playfile = '/home/polyppi/raspberrypi-firmware/synced_files/epflsync/gorgeous3.wav'
         logging.info("Selected: " + str(playfile))
         self.wf = wave.open(playfile, 'rb')
         logging.info("Opened Playfile")
