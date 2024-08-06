@@ -99,7 +99,6 @@ class FilePlayback(object):
 
 def adjust_volume(level):
     volume_percentage = int(level * MAX_LEVEL)
-    logger.debug(f"Setting volume to {volume_percentage}%")
     player.set_volume(volume_percentage)
 
 def event_a():
