@@ -2,6 +2,10 @@ This is some basic firmware with which to handle audio I/O through GCP.
 
 Ensure you've cloned into ~/raspberrypi-firmware.
 
+On a new build, move ssh keys to the known hosts subdir:
+ssh-keyscan -H 34.66.128.13 >> ~/.ssh/known_hosts
+
+
 Run:
 docker build -t raspberrypi-firmware .
 to build the Docker image.
