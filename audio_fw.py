@@ -11,6 +11,7 @@ import pyaudio
 import requests
 import schedule
 import pwd
+import numpy as np
 
 # Configure logging
 logger = logging.getLogger()
@@ -36,8 +37,10 @@ logger.addHandler(console_handler)
 AUDIO_DIR = '/home/polyppi/raspberrypi-firmware/synced_files/epflsync'
 
 # Configuration file path
-CONFIG_FILE = '/app/config.json'
+CONFIG_FILE = '/home/polyppi/raspberrypi-firmware/config.json'
 INIT_FLAG_FILE = '/var/log/audio_fw_initialized.flag'
+
+MAX_LEVEL = 100  # Initialize MAX_LEVEL with a default value
 
 def load_config():
     try:
@@ -47,9 +50,15 @@ def load_config():
         logger.error(f'Configuration file not found: {CONFIG_FILE}')
         return {"MAX_VOLUME": 100}
 
-# Max volume level (percentage) from configuration file
-config = load_config()
-MAX_LEVEL = config.get('MAX_VOLUME', 100)
+def reload_config():
+    global MAX_LEVEL
+    config = load_config()
+    new_max_level = config.get('MAX_VOLUME', 100)
+    if new_max_level != MAX_LEVEL:
+        logger.info(f'MAX_VOLUME changed from {MAX_LEVEL} to {new_max_level}')
+        MAX_LEVEL = new_max_level
+    else:
+        logger.info(f'MAX_VOLUME remains at {MAX_LEVEL}')
 
 DISCORD_INIT_WEBHOOK = os.getenv('DISCORD_INIT_WEBHOOK')
 DISCORD_CRASH_WEBHOOK = os.getenv('DISCORD_CRASH_WEBHOOK')
@@ -60,6 +69,8 @@ def send_discord_message(webhook_url, message):
     response = requests.post(webhook_url, json=data)
     if response.status_code != 204:
         logger.error(f"Failed to send message to Discord: {response.status_code}, {response.text}")
+    else:
+        logger.info(f"Successfully sent message to Discord: {message}")
 
 class FilePlayback(object):
     def __init__(self):
@@ -222,17 +233,29 @@ def heartbeat():
 
 def main():
     global player
+    global MAX_LEVEL
+    config = load_config()
+    MAX_LEVEL = config.get('MAX_VOLUME', 100)
     player = FilePlayback()  # Corrected assignment
     logger.info('Audio firmware script started')
 
+    # Check and remove the init flag file if it exists
+    if os.path.exists(INIT_FLAG_FILE):
+        os.remove(INIT_FLAG_FILE)
+        logger.info(f"Removed init flag file: {INIT_FLAG_FILE}")
+
     # Send Discord message if not already sent
     if not os.path.exists(INIT_FLAG_FILE):
-        send_discord_message(DISCORD_INIT_WEBHOOK, f"Audio firmware script initialized successfully on {os.uname()[1]} by {pwd.getpwuid(os.getuid()).pw_name}")
+        message = f"Audio firmware script initialized successfully on {os.uname()[1]} by {pwd.getpwuid(os.getuid()).pw_name}"
+        send_discord_message(DISCORD_INIT_WEBHOOK, message)
         with open(INIT_FLAG_FILE, 'w') as f:
             f.write('initialized')
 
     # Schedule the heartbeat function to run every 24 hours
     schedule.every(24).hours.do(heartbeat)
+
+    # Schedule the config reload function to run every 60 seconds
+    schedule.every(60).seconds.do(reload_config)
 
     while True:
         schedule.run_pending()
