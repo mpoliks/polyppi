@@ -41,6 +41,21 @@ else
     exit 1
 fi
 
+# Get the Discord webhook URL from the environment variable
+WEBHOOK_URL=${DISCORD_HEARTBEAT_WEBHOOK}
+
+# Start the sync config script
+echo "Starting sync config script..." >> $LOG_FILE
+python3 /usr/local/bin/sync_config.py "$WEBHOOK_URL" >> $LOG_FILE 2>&1 &
+SYNC_CONFIG_PID=$!
+
+if [ $? -eq 0 ]; then
+    echo "[$(date)] Sync config script started with PID $SYNC_CONFIG_PID." >> $LOG_FILE
+else
+    echo "[$(date)] Failed to start sync config script." >> $LOG_FILE
+    exit 1
+fi
 # Keep the script running to avoid container exit
 wait $AUDIO_FW_PID
 wait $MONITOR_DOCKER_PID
+wait $SYNC_CONFIG_PID
