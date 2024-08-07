@@ -4,10 +4,13 @@ import os
 import random
 import time
 import logging
-import numpy as np
+import json
 import alsaaudio
 import wave
 import pyaudio
+import requests
+import schedule
+import pwd
 
 # Configure logging
 logger = logging.getLogger()
@@ -32,8 +35,31 @@ logger.addHandler(console_handler)
 # Set the directory to search within the subdirectory 'epflsync'
 AUDIO_DIR = '/home/polyppi/raspberrypi-firmware/synced_files/epflsync'
 
-# Max volume level (percentage)
-MAX_LEVEL = 100
+# Configuration file path
+CONFIG_FILE = '/app/config.json'
+INIT_FLAG_FILE = '/var/log/audio_fw_initialized.flag'
+
+def load_config():
+    try:
+        with open(CONFIG_FILE, 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        logger.error(f'Configuration file not found: {CONFIG_FILE}')
+        return {"MAX_VOLUME": 100}
+
+# Max volume level (percentage) from configuration file
+config = load_config()
+MAX_LEVEL = config.get('MAX_VOLUME', 100)
+
+DISCORD_INIT_WEBHOOK = os.getenv('DISCORD_INIT_WEBHOOK')
+DISCORD_CRASH_WEBHOOK = os.getenv('DISCORD_CRASH_WEBHOOK')
+DISCORD_HEARTBEAT_WEBHOOK = os.getenv('DISCORD_HEARTBEAT_WEBHOOK')
+
+def send_discord_message(webhook_url, message):
+    data = {"content": message}
+    response = requests.post(webhook_url, json=data)
+    if response.status_code != 204:
+        logger.error(f"Failed to send message to Discord: {response.status_code}, {response.text}")
 
 class FilePlayback(object):
     def __init__(self):
@@ -164,24 +190,24 @@ def event_c():
     while time.time() < end_time:
         duration = random.uniform(1, 10)
         max_level = random.uniform(0.5, 1.0)
-        steps = int(duration * 50)
-        
+        steps = int(duration * 50)  # 50 updates per second
+
         # Upward sweep
-        up_sweep = quadratic_adjustment(0, max_level, duration, steps)
-        for t in up_sweep:
-            adjust_volume(t)
-            time.sleep(0.02)
-        
+        up_sweep = [(4 * t * (1 - t)) for t in np.linspace(0, max_level, steps)]
+        for volume_level in up_sweep:
+            adjust_volume(volume_level)
+            time.sleep(0.02)  # 20 ms
+
         # Pause at the top
         swell_duration = random.uniform(1, 5)
         logger.debug(f"Swell duration at top: {swell_duration} seconds")
         time.sleep(swell_duration)
 
         # Downward sweep
-        down_sweep = quadratic_adjustment(max_level, 0, duration, steps)
-        for t in down_sweep:
-            adjust_volume(t)
-            time.sleep(0.02)
+        down_sweep = [(4 * t * (1 - t)) for t in np.linspace(max_level, 0, steps)]
+        for volume_level in down_sweep:
+            adjust_volume(volume_level)
+            time.sleep(0.02)  # 20 ms
 
         # Optional: Add a brief pause between sweeps
         if random.choice([True, False]):
@@ -191,15 +217,27 @@ def event_c():
 
     logger.info("Ending event C")
 
+def heartbeat():
+    send_discord_message(DISCORD_HEARTBEAT_WEBHOOK, f"Heartbeat: Audio firmware script is running on {os.uname()[1]} by {pwd.getpwuid(os.getuid()).pw_name}")
 
 def main():
     global player
-    player = FilePlayback()
+    player = FilePlayback()  # Corrected assignment
     logger.info('Audio firmware script started')
 
+    # Send Discord message if not already sent
+    if not os.path.exists(INIT_FLAG_FILE):
+        send_discord_message(DISCORD_INIT_WEBHOOK, f"Audio firmware script initialized successfully on {os.uname()[1]} by {pwd.getpwuid(os.getuid()).pw_name}")
+        with open(INIT_FLAG_FILE, 'w') as f:
+            f.write('initialized')
+
+    # Schedule the heartbeat function to run every 24 hours
+    schedule.every(24).hours.do(heartbeat)
+
     while True:
-        
-        if not player.is_streaming(): player.play()
+        schedule.run_pending()
+        if not player.is_streaming():
+            player.play()
 
         try:
             # Select and execute a volume automation event
@@ -211,6 +249,7 @@ def main():
                 event_b()
             else:
                 event_c()
+
             # Sleep for a random duration between 20 and 240 seconds
             sleep_duration = random.uniform(20, 240)
             logger.info(f'Sleeping for {sleep_duration} seconds')

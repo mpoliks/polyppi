@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # Log file
-LOG_FILE="/var/log/sync.log"
+LOG_FILE="/var/log/startup.log"
+
+echo "Starting startup script..." >> $LOG_FILE
 
 # Sync with GCP on reboot
 echo "Syncing with GCP..." >> $LOG_FILE
@@ -17,6 +19,28 @@ fi
 
 # Start the audio firmware script
 echo "Starting audio firmware script..." >> $LOG_FILE
-python3 /usr/local/bin/audio_fw.py >> $LOG_FILE 2>&1
+python3 /usr/local/bin/audio_fw.py >> $LOG_FILE 2>&1 &
+AUDIO_FW_PID=$!
 
-echo "[$(date)] Audio firmware script started." >> $LOG_FILE
+if [ $? -eq 0 ]; then
+    echo "[$(date)] Audio firmware script started with PID $AUDIO_FW_PID." >> $LOG_FILE
+else
+    echo "[$(date)] Failed to start audio firmware script." >> $LOG_FILE
+    exit 1
+fi
+
+# Start the monitor script
+echo "Starting monitor script..." >> $LOG_FILE
+/usr/local/bin/monitor_docker.sh >> $LOG_FILE 2>&1 &
+MONITOR_DOCKER_PID=$!
+
+if [ $? -eq 0 ]; then
+    echo "[$(date)] Monitor script started with PID $MONITOR_DOCKER_PID." >> $LOG_FILE
+else
+    echo "[$(date)] Failed to start monitor script." >> $LOG_FILE
+    exit 1
+fi
+
+# Keep the script running to avoid container exit
+wait $AUDIO_FW_PID
+wait $MONITOR_DOCKER_PID
