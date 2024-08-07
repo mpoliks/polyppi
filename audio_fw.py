@@ -12,6 +12,10 @@ import requests
 import schedule
 import pwd
 import numpy as np
+import uuid
+
+# Unique identifier for each run
+RUN_ID = str(uuid.uuid4())
 
 # Configure logging
 logger = logging.getLogger()
@@ -20,13 +24,13 @@ logger.setLevel(logging.DEBUG)
 # Log to file
 file_handler = logging.FileHandler('/var/log/audio_fw.log')
 file_handler.setLevel(logging.DEBUG)
-file_formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+file_formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s [RUN_ID: ' + RUN_ID + ']')
 file_handler.setFormatter(file_formatter)
 
 # Log to console
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.DEBUG)
-console_formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+console_formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s [RUN_ID: ' + RUN_ID + ']')
 console_handler.setFormatter(console_formatter)
 
 # Add handlers to the logger
@@ -52,6 +56,7 @@ def load_config():
 
 def reload_config():
     global MAX_LEVEL
+    logger.debug("Running reload_config")
     config = load_config()
     new_max_level = config.get('MAX_VOLUME', 100)
     if new_max_level != MAX_LEVEL:
@@ -59,6 +64,7 @@ def reload_config():
         MAX_LEVEL = new_max_level
     else:
         logger.info(f'MAX_VOLUME remains at {MAX_LEVEL}')
+    logger.debug("Completed reload_config")
 
 DISCORD_INIT_WEBHOOK = os.getenv('DISCORD_INIT_WEBHOOK')
 DISCORD_CRASH_WEBHOOK = os.getenv('DISCORD_CRASH_WEBHOOK')
@@ -97,42 +103,64 @@ class FilePlayback(object):
         else:
             logging.error("No mixer available to set volume")
 
-    def play(self):
-        logging.info("Starting Playback")
-        self.volume = 100  # Assuming a constant playback volume for simplicity
-        logging.info(self.volume)
-        logging.info(self.m)
-        self.m.setvolume(self.volume)
-        logging.info("Selecting from " + str(AUDIO_DIR))
-        playfile = AUDIO_DIR + "/" + random.choice(os.listdir(AUDIO_DIR))
-        logging.info("Selected: " + str(playfile))
-        self.wf = wave.open(playfile, 'rb')
-        logging.info("Opened Playfile")
-        self.pa = pyaudio.PyAudio()
-        logging.info("Playing back " + playfile)
-        self.stream = self.pa.open(format=self.pa.get_format_from_width(self.wf.getsampwidth()),
-                                   channels=self.wf.getnchannels(),
-                                   rate=self.wf.getframerate(),
-                                   output=True,
-                                   stream_callback=self.callback)
+    def play(self, retries=5, backoff_factor=1):
+        attempt = 0
+        logging.debug("Entered Playback Function")
+        while attempt < retries:
+            logging.info(f"Starting Playback, attempt {attempt + 1}")
+            self.volume = 100  # Assuming a constant playback volume for simplicity
+            logging.info(self.volume)
+            logging.info(self.m)
+            try:
+                self.m.setvolume(self.volume)
+                logging.info("Selecting from " + str(AUDIO_DIR))
+                playfile = AUDIO_DIR + "/" + random.choice(os.listdir(AUDIO_DIR))
+                logging.info("Selected: " + str(playfile))
+                self.wf = wave.open(playfile, 'rb')
+                logging.info("Opened Playfile")
+                self.pa = pyaudio.PyAudio()
+                logging.info("Playing back " + playfile)
+                self.stream = self.pa.open(format=self.pa.get_format_from_width(self.wf.getsampwidth()),
+                                           channels=self.wf.getnchannels(),
+                                           rate=self.wf.getframerate(),
+                                           output=True,
+                                           stream_callback=self.callback)
+                return  # Exit the function if playback starts successfully
+            except Exception as e:
+                logging.error(f"Error during playback initialization: {str(e)}")
+                send_discord_message(DISCORD_CRASH_WEBHOOK, f"Error during playback initialization: {str(e)}")
+                attempt += 1
+                if attempt < retries:
+                    sleep_time = backoff_factor * (2 ** attempt)
+                    logging.info(f"Retrying playback initialization in {sleep_time} seconds")
+                    time.sleep(sleep_time)
+                else:
+                    logging.error("Maximum retries reached, giving up on playback initialization")
 
     def callback(self, in_data, frame_count, time_info, status):
-        data = self.wf.readframes(frame_count)
-        return (data, pyaudio.paContinue)
+        try:
+            data = self.wf.readframes(frame_count)
+            return (data, pyaudio.paContinue)
+        except Exception as e:
+            logging.error(f"Error in playback callback: {str(e)}")
+            send_discord_message(DISCORD_CRASH_WEBHOOK, f"Error in playback callback: {str(e)}")
+            return (None, pyaudio.paAbort)
 
     def is_streaming(self):
         try:
             if self.stream is None: return False
             if self.stream.is_active(): return True
         except OSError as e:
+            logging.error(f"OSError in is_streaming: {str(e)}")
             return False
         return False
 
     def kill_stream(self):
         logging.info("Killing Playback Stream")
-        self.stream.stop_stream()
-        self.stream.close()
-        self.pa.terminate()
+        if self.stream:
+            self.stream.stop_stream()
+            self.stream.close()
+            self.pa.terminate()
 
 def adjust_volume(level):
     volume_percentage = int(level * MAX_LEVEL)
@@ -236,6 +264,7 @@ def main():
     global MAX_LEVEL
     config = load_config()
     MAX_LEVEL = config.get('MAX_VOLUME', 100)
+    logger.debug(f"Init MAX_LEVEL SET {MAX_LEVEL}.")
     player = FilePlayback()  # Corrected assignment
     logger.info('Audio firmware script started')
 
@@ -253,13 +282,16 @@ def main():
 
     # Schedule the heartbeat function to run every 24 hours
     schedule.every(24).hours.do(heartbeat)
-
+    logger.debug("made it through first scheduler")
     # Schedule the config reload function to run every 60 seconds
     schedule.every(60).seconds.do(reload_config)
+    logger.debug("Playing Back First Audio File")
+    player.play()
 
     while True:
         schedule.run_pending()
         if not player.is_streaming():
+            player.killStream()
             player.play()
 
         try:
@@ -279,6 +311,8 @@ def main():
             time.sleep(sleep_duration)
         except Exception as e:
             logger.error(f'Error in audio firmware script: {str(e)}')
+            send_discord_message(DISCORD_CRASH_WEBHOOK, f"Error in audio firmware script: {str(e)}")
 
 if __name__ == '__main__':
     main()
+
