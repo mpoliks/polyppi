@@ -15,6 +15,7 @@ docker run -d --name raspberrypi-firmware --restart unless-stopped \
   --device /dev/snd \
   -v /home/polyppi/.ssh:/root/.ssh:ro \
   -v /home/polyppi/raspberrypi-firmware/synced_files:/home/polyppi/raspberrypi-firmware/synced_files \
+  -v /home/polyppi/raspberrypi-firmware/config.json:/app/config.json \
   -v /home/polyppi/logs:/var/log \
   -e DISCORD_INIT_WEBHOOK=${add url here}"
   -e DISCORD_CRASH_WEBHOOK=${add url here}"
