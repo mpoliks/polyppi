@@ -291,7 +291,7 @@ def main():
     while True:
         schedule.run_pending()
         if not player.is_streaming():
-            player.killStream()
+            player.kill_stream()
             player.play()
 
         try:
