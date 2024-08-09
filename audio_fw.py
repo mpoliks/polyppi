@@ -70,6 +70,15 @@ DISCORD_INIT_WEBHOOK = os.getenv('DISCORD_INIT_WEBHOOK')
 DISCORD_CRASH_WEBHOOK = os.getenv('DISCORD_CRASH_WEBHOOK')
 DISCORD_HEARTBEAT_WEBHOOK = os.getenv('DISCORD_HEARTBEAT_WEBHOOK')
 
+def get_cpu_temperature():
+    try:
+        with open("/sys/class/thermal/thermal_zone0/temp", "r") as f:
+            temp = int(f.read()) / 1000.0  # Convert from millidegrees to degrees
+            return temp
+    except FileNotFoundError:
+        logger.error("Could not read CPU temperature: File not found")
+        return None
+
 def send_discord_message(webhook_url, message):
     data = {"content": message}
     response = requests.post(webhook_url, json=data)
@@ -116,6 +125,12 @@ class FilePlayback(object):
                 logging.info("Selecting from " + str(AUDIO_DIR))
                 playfile = AUDIO_DIR + "/" + random.choice(os.listdir(AUDIO_DIR))
                 logging.info("Selected: " + str(playfile))
+                # Check if the file is a valid WAV file
+                with open(playfile, 'rb') as f:
+                    if f.read(4) != b'RIFF':
+                        logging.error(f"File does not start with RIFF id: {playfile}")
+                        send_discord_message(DISCORD_CRASH_WEBHOOK, f"File does not start with RIFF id: {playfile}")
+                        raise ValueError("Invalid WAV file format")
                 self.wf = wave.open(playfile, 'rb')
                 logging.info("Opened Playfile")
                 self.pa = pyaudio.PyAudio()
@@ -257,7 +272,12 @@ def event_c():
     logger.info("Ending event C")
 
 def heartbeat():
-    send_discord_message(DISCORD_HEARTBEAT_WEBHOOK, f"Heartbeat: Audio firmware script is running on {os.uname()[1]} by {pwd.getpwuid(os.getuid()).pw_name}")
+    temperature = get_cpu_temperature()
+    if temperature is not None:
+        logger.info(f"CPU Temperature: {temperature:.2f}\u00B0C")
+    else:
+        logger.error("Failed to retrieve CPU temperature")
+    send_discord_message(DISCORD_HEARTBEAT_WEBHOOK, f"Heartbeat: Audio firmware script is running on {os.uname()[1]} by {pwd.getpwuid(os.getuid()).pw_name}. Operating temp = {temperature}.")
 
 def main():
     global player
@@ -275,13 +295,18 @@ def main():
 
     # Send Discord message if not already sent
     if not os.path.exists(INIT_FLAG_FILE):
-        message = f"Audio firmware script initialized successfully on {os.uname()[1]} by {pwd.getpwuid(os.getuid()).pw_name}"
+        temperature = get_cpu_temperature()
+        if temperature is not None:
+            logger.info(f"CPU Temperature: {temperature:.2f}\u00B0C")
+        else:
+            logger.error("Failed to retrieve CPU temperature")
+        message = f"Audio firmware script initialized successfully on {os.uname()[1]} by {pwd.getpwuid(os.getuid()).pw_name}. Operating temperature = {temperature}."
         send_discord_message(DISCORD_INIT_WEBHOOK, message)
         with open(INIT_FLAG_FILE, 'w') as f:
             f.write('initialized')
 
     # Schedule the heartbeat function to run every 24 hours
-    schedule.every(24).hours.do(heartbeat)
+    schedule.every(2).hours.do(heartbeat)
     logger.debug("made it through first scheduler")
     # Schedule the config reload function to run every 60 seconds
     schedule.every(60).seconds.do(reload_config)

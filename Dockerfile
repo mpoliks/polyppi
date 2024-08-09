@@ -2,7 +2,7 @@ FROM arm64v8/debian:buster-slim
 
 # Install dependencies
 RUN apt-get update && \
-    apt-get install -y rsync cron ffmpeg python3-pip libasound2-dev alsa-utils openssh-client libportaudio2 libportaudiocpp0 portaudio19-dev curl procps && \
+    apt-get install -y rsync cron ffmpeg python3-pip libasound2-dev  alsa-utils openssh-client libportaudio2 libportaudiocpp0 portaudio19-dev curl procps && \
     pip3 install pydub numpy pyalsaaudio pyaudio requests schedule
 
 # Create .ssh directory
