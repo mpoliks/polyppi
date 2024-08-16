@@ -1,3 +1,4 @@
 {
-    "MAX_VOLUME": 100
+  "MAX_VOLUME": 100,
+  "DENSITY": "medium"
 }
