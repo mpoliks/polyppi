@@ -339,7 +339,7 @@ def main():
             logger.info(f"CPU Temperature: {temperature:.2f}\u00B0C")
         else:
             logger.error("Failed to retrieve CPU temperature")
-        message = f"Audio firmware script initialized successfully on {os.uname()[1]} by {pwd.getpwuid(os.getuid()).pw_name}. Operating temperature = {temperature}. Density level = {DENSITY}."
+        message = f"Audio firmware script initialized successfully on {os.uname()[1]} by {pwd.getpwuid(os.getuid()).pw_name}. Operating temperature = {temperature}. Density level = {DENSITY}. Volume = {MAX_LEVEL}."
         send_discord_message(DISCORD_INIT_WEBHOOK, message)
         with open(INIT_FLAG_FILE, 'w') as f:
             f.write('initialized')
