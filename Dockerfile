@@ -16,16 +16,12 @@ COPY config.json /home/polyppi/raspberrypi-firmware/config.json
 
 # Copy scripts to the container
 COPY audio_fw.py /usr/local/bin/audio_fw.py
-COPY sync_to_gcp.sh /usr/local/bin/sync_to_gcp.sh
 COPY startup.sh /usr/local/bin/startup.sh
 COPY monitor_docker.sh /usr/local/bin/monitor_docker.sh
 COPY sync_config.py /usr/local/bin/sync_config.py
 
 # Set executable permissions
-RUN chmod +x /usr/local/bin/audio_fw.py /usr/local/bin/sync_to_gcp.sh /usr/local/bin/startup.sh /usr/local/bin/monitor_docker.sh /usr/local/bin/sync_config.py
-
-# Set up cron job for syncing
-RUN (crontab -l ; echo "0 0 * * * /usr/local/bin/sync_to_gcp.sh >> /var/log/sync.log 2>&1") | crontab -
+RUN chmod +x /usr/local/bin/audio_fw.py /usr/local/bin/startup.sh /usr/local/bin/monitor_docker.sh /usr/local/bin/sync_config.py
 
 # Start the startup script
 CMD ["/usr/local/bin/startup.sh"]

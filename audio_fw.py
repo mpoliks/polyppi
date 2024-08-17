@@ -13,6 +13,8 @@ import schedule
 import pwd
 import numpy as np
 import uuid
+import subprocess
+from datetime import datetime, timedelta
 
 # Unique identifier for each run
 RUN_ID = str(uuid.uuid4())
@@ -43,8 +45,10 @@ AUDIO_DIR = '/home/polyppi/raspberrypi-firmware/synced_files/epflsync'
 # Configuration file path
 CONFIG_FILE = '/home/polyppi/raspberrypi-firmware/config.json'
 INIT_FLAG_FILE = '/var/log/audio_fw_initialized.flag'
+LAST_SYNC_FILE = '/var/log/last_sync_time.flag'
 
 MAX_LEVEL = 100  # Initialize MAX_LEVEL with a default value
+DENSITY = "medium"  # Initialize DENSITY with a default value
 
 def load_config():
     try:
@@ -52,19 +56,74 @@ def load_config():
             return json.load(f)
     except FileNotFoundError:
         logger.error(f'Configuration file not found: {CONFIG_FILE}')
-        return {"MAX_VOLUME": 100}
+        return {"MAX_VOLUME": 100, "DENSITY": "medium"}
 
 def reload_config():
-    global MAX_LEVEL
+    global MAX_LEVEL, DENSITY
     logger.debug("Running reload_config")
     config = load_config()
     new_max_level = config.get('MAX_VOLUME', 100)
+    new_density = config.get('DENSITY', "medium")
+
     if new_max_level != MAX_LEVEL:
         logger.info(f'MAX_VOLUME changed from {MAX_LEVEL} to {new_max_level}')
+        message = f'MAX_VOLUME changed from {MAX_LEVEL} to {new_max_level} on {os.uname()[1]} by {pwd.getpwuid(os.getuid()).pw_name}.'
+        send_discord_message(DISCORD_HEARTBEAT_WEBHOOK, message)
         MAX_LEVEL = new_max_level
     else:
         logger.info(f'MAX_VOLUME remains at {MAX_LEVEL}')
+
+    if new_density != DENSITY:
+        logger.info(f'DENSITY changed from {DENSITY} to {new_density}')
+        message = f'DENSITY changed from {DENSITY} to {new_density} on {os.uname()[1]} by {pwd.getpwuid(os.getuid()).pw_name}.'
+        send_discord_message(DISCORD_HEARTBEAT_WEBHOOK, message)
+        DENSITY = new_density
+    else:
+        logger.info(f'DENSITY remains at {DENSITY}')
+
     logger.debug("Completed reload_config")
+
+def sync_to_gcp():
+    logger.info("Starting sync to GCP...")
+    
+    GCP_USER = "mpoliks"
+    GCP_HOST = "34.66.128.13"
+    GCP_PATH = "/home/mpoliks/synced_files/"
+    LOCAL_PATH = "/home/polyppi/raspberrypi-firmware/synced_files/"
+    
+    try:
+        rsync_command = [
+            "rsync", "-avz", "--progress", "--delete", "-e", "ssh -i ~/.ssh/id_rsa",
+            f"{GCP_USER}@{GCP_HOST}:{GCP_PATH}", LOCAL_PATH
+        ]
+        result = subprocess.run(rsync_command, capture_output=True, text=True)
+        
+        if result.returncode == 0:
+            logger.info("GCP sync completed successfully.")
+            send_discord_message(DISCORD_HEARTBEAT_WEBHOOK, f"GCP sync completed successfully on {pwd.getpwuid(os.getuid()).pw_name}.")
+            with open(LAST_SYNC_FILE, 'w') as f:
+                f.write(datetime.now().isoformat())
+        else:
+            logger.error(f"GCP sync failed: {result.stderr}")
+            send_discord_message(DISCORD_CRASH_WEBHOOK, f"GCP sync failed: {result.stderr}")
+    except Exception as e:
+        logger.error(f"Error during GCP sync: {str(e)}")
+        send_discord_message(DISCORD_CRASH_WEBHOOK, f"Error during GCP sync: {str(e)}")
+
+def should_sync():
+    try:
+        if os.path.exists(LAST_SYNC_FILE):
+            with open(LAST_SYNC_FILE, 'r') as f:
+                last_sync_time = datetime.fromisoformat(f.read().strip())
+            if datetime.now() - last_sync_time >= timedelta(hours=1):
+                return True
+        else:
+            return True  # If the file doesn't exist, perform the sync
+    except Exception as e:
+        logger.error(f"Error checking last sync time: {str(e)}")
+        return True  # In case of error, attempt to sync
+
+    return False
 
 DISCORD_INIT_WEBHOOK = os.getenv('DISCORD_INIT_WEBHOOK')
 DISCORD_CRASH_WEBHOOK = os.getenv('DISCORD_CRASH_WEBHOOK')
@@ -122,9 +181,9 @@ class FilePlayback(object):
             logging.info(self.m)
             try:
                 self.m.setvolume(self.volume)
-                logging.info("Selecting from " + str(AUDIO_DIR))
+                logging.info(f"Selecting from {AUDIO_DIR} with density {DENSITY}")
                 playfile = AUDIO_DIR + "/" + random.choice(os.listdir(AUDIO_DIR))
-                logging.info("Selected: " + str(playfile))
+                logging.info(f"Selected: {playfile}")
                 # Check if the file is a valid WAV file
                 with open(playfile, 'rb') as f:
                     if f.read(4) != b'RIFF':
@@ -134,7 +193,7 @@ class FilePlayback(object):
                 self.wf = wave.open(playfile, 'rb')
                 logging.info("Opened Playfile")
                 self.pa = pyaudio.PyAudio()
-                logging.info("Playing back " + playfile)
+                logging.info(f"Playing back {playfile} with density {DENSITY}")
                 self.stream = self.pa.open(format=self.pa.get_format_from_width(self.wf.getsampwidth()),
                                            channels=self.wf.getnchannels(),
                                            rate=self.wf.getframerate(),
@@ -183,7 +242,16 @@ def adjust_volume(level):
 
 def event_a():
     logger.info("Starting event A: series of sweeps")
-    num_sweeps = random.randint(1, 5)
+    
+    if DENSITY == "high":
+        num_sweeps = random.randint(3, 9)
+    elif DENSITY == "medium":
+        num_sweeps = random.randint(1, 6)
+    elif DENSITY == "low":
+        num_sweeps = random.randint(1, 3)
+    else:
+        num_sweeps = random.randint(1, 5)  # Default if DENSITY is unexpected
+
     for _ in range(num_sweeps):
         duration = random.uniform(1, 4)
         steps = int(duration * 50)  # 50 updates per second
@@ -209,13 +277,23 @@ def event_a():
     
     logger.info("Ending event A")
 
+
 def event_b():
     logger.info("Starting event B: plateau")
     
-    fade_in_duration = random.uniform(2, 20)
-    plateau_duration = random.uniform(10, 100)
-    fade_out_duration = random.uniform(2, 20)
-    
+    if DENSITY == "high" or DENSITY == "medium": 
+        fade_in_duration = random.uniform(2, 20)
+        plateau_duration = random.uniform(30, 100)
+        fade_out_duration = random.uniform(2, 20)
+    elif DENSITY == "low": 
+        fade_in_duration = random.uniform(2, 20)
+        plateau_duration = random.uniform(10, 30)
+        fade_out_duration = random.uniform(2, 20)
+    else:
+        fade_in_duration = random.uniform(2, 15)  # Default values if DENSITY is unexpected
+        plateau_duration = random.uniform(20, 50)
+        fade_out_duration = random.uniform(2, 15)
+
     logger.info(f"Fade-in duration: {fade_in_duration} seconds")
     logger.info(f"Plateau duration: {plateau_duration} seconds")
     logger.info(f"Fade-out duration: {fade_out_duration} seconds")
@@ -253,7 +331,15 @@ def event_c():
             time.sleep(0.02)  # 20 ms
 
         # Pause at the top
-        swell_duration = random.uniform(1, 5)
+        if DENSITY == "high":
+            swell_duration = random.uniform(3, 15)
+        elif DENSITY == "medium":
+            swell_duration = random.uniform(3, 10)        
+        elif DENSITY == "low":
+            swell_duration = random.uniform(1, 5)
+        else:
+            swell_duration = random.uniform(1, 10)  # Default if DENSITY is unexpected
+        
         logger.debug(f"Swell duration at top: {swell_duration} seconds")
         time.sleep(swell_duration)
 
@@ -281,10 +367,11 @@ def heartbeat():
 
 def main():
     global player
-    global MAX_LEVEL
+    global MAX_LEVEL, DENSITY
     config = load_config()
     MAX_LEVEL = config.get('MAX_VOLUME', 100)
-    logger.debug(f"Init MAX_LEVEL SET {MAX_LEVEL}.")
+    DENSITY = config.get('DENSITY', "medium")
+    logger.debug(f"Init MAX_LEVEL SET {MAX_LEVEL}. Init DENSITY SET {DENSITY}.")
     player = FilePlayback()  # Corrected assignment
     logger.info('Audio firmware script started')
 
@@ -300,7 +387,7 @@ def main():
             logger.info(f"CPU Temperature: {temperature:.2f}\u00B0C")
         else:
             logger.error("Failed to retrieve CPU temperature")
-        message = f"Audio firmware script initialized successfully on {os.uname()[1]} by {pwd.getpwuid(os.getuid()).pw_name}. Operating temperature = {temperature}."
+        message = f"Audio firmware script initialized successfully on {os.uname()[1]} by {pwd.getpwuid(os.getuid()).pw_name}. Operating temperature = {temperature}. Density level = {DENSITY} and volume = {MAX_LEVEL}."
         send_discord_message(DISCORD_INIT_WEBHOOK, message)
         with open(INIT_FLAG_FILE, 'w') as f:
             f.write('initialized')
@@ -316,6 +403,10 @@ def main():
     while True:
         schedule.run_pending()
         if not player.is_streaming():
+            # Check if an hour has passed since the last sync and perform sync if needed
+            if should_sync():
+                sync_to_gcp()
+
             player.kill_stream()
             player.play()
 
@@ -331,7 +422,14 @@ def main():
                 event_c()
 
             # Sleep for a random duration between 20 and 240 seconds
-            sleep_duration = random.uniform(20, 240)
+            if DENSITY == "high":
+                sleep_duration = random.uniform(3, 40)
+            elif DENSITY == "medium":
+                sleep_duration = random.uniform(10, 120)                
+            elif DENSITY == "low":
+                sleep_duration = random.uniform(20, 240)                
+            else:
+                sleep_duration = random.uniform(10, 120)  # Default if DENSITY is unexpected
             logger.info(f'Sleeping for {sleep_duration} seconds')
             time.sleep(sleep_duration)
         except Exception as e:

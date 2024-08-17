@@ -28,7 +28,7 @@ def load_local_config():
             return json.load(f)
     except FileNotFoundError:
         logger.error(f'Configuration file not found: {LOCAL_PATH}')
-        return {"MAX_VOLUME": 100}
+        return {"MAX_VOLUME": 100, "DENSITY": "medium"}  # Default values
 
 def sync_config(webhook_url):
     url = f'http://{GCP_HOST}:{GCP_PORT}/get_config'
@@ -40,13 +40,28 @@ def sync_config(webhook_url):
             logger.info(f"Received config: {config}")
             local_config = load_local_config()
             logger.info(f"Local config: {local_config}")
+            config_updated = False
+
+            # Check for MAX_VOLUME changes
             if config.get('MAX_VOLUME') != local_config.get('MAX_VOLUME'):
+                local_config['MAX_VOLUME'] = config['MAX_VOLUME']
+                config_updated = True
+                # send_discord_message(webhook_url, "Volume Change Received by Pi!")
+
+            # Check for DENSITY changes
+            if config.get('DENSITY') != local_config.get('DENSITY'):
+                local_config['DENSITY'] = config['DENSITY']
+                config_updated = True
+                # send_discord_message(webhook_url, "Density Change Received by Pi!")
+
+            # Update the local config if any changes were detected
+            if config_updated:
                 with open(LOCAL_PATH, 'w') as f:
-                    json.dump(config, f, indent=4)
-                logger.info(f"Config updated: {config}")
-                send_discord_message(webhook_url, "Volume Change Received by Pi!")
+                    json.dump(local_config, f, indent=4)
+                logger.info(f"Config updated: {local_config}")
             else:
-                logger.info("No change in volume")
+                logger.info("No changes in configuration")
+
         else:
             logger.error(f"Failed to fetch config: {response.status_code}")
     except Exception as e:
@@ -56,7 +71,6 @@ if __name__ == '__main__':
     if len(sys.argv) != 2:
         logger.error("Usage: sync_config.py <discord_webhook_url>")
         sys.exit(1)
-
     webhook_url = sys.argv[1]
 
     while True:
