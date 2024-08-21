@@ -7,7 +7,7 @@ import logging
 # Configuration
 GCP_HOST = "34.66.128.13"
 GCP_PORT = 5000
-LOCAL_PATH = "/home/polyppi/raspberrypi-firmware/config.json"
+LOCAL_PATH = os.path.expanduser('~/raspberrypi-firmware/synced_files/')
 LOG_FILE = "/var/log/sync_config.log"
 
 # Configure logging

@@ -12,7 +12,7 @@ RUN mkdir -p /root/.ssh
 COPY known_hosts /root/.ssh/known_hosts
 
 # Copy config.json to /app
-COPY config.json /home/polyppi/raspberrypi-firmware/config.json
+COPY config.json $HOME/raspberrypi-firmware/config.json
 
 # Copy scripts to the container
 COPY audio_fw.py /usr/local/bin/audio_fw.py
