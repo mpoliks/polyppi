@@ -43,7 +43,7 @@ logger.addHandler(console_handler)
 AUDIO_DIR = '/home/polyppi/raspberrypi-firmware/synced_files/epflsync'
 
 # Configuration file path
-CONFIG_FILE = '/home/polyppi/raspberrypi-firmware/config.json')
+CONFIG_FILE = "/home/polyppi/raspberrypi-firmware/config.json"
 INIT_FLAG_FILE = '/var/log/audio_fw_initialized.flag'
 LAST_SYNC_FILE = '/var/log/last_sync_time.flag'
 
@@ -89,7 +89,7 @@ def sync_to_gcp():
     GCP_USER = "mpoliks"
     GCP_HOST = "34.66.128.13"
     GCP_PATH = "/home/mpoliks/synced_files/"
-    LOCAL_PATH = "/home/polyppi/raspberrypi-firmware/synced_files/'
+    LOCAL_PATH = "/home/polyppi/raspberrypi-firmware/synced_files/"
     
     try:
         rsync_command = [
